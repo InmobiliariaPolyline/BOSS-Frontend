@@ -1,0 +1,7 @@
+.avatar-placeholder {
+  user-select: none;
+}
+.badge {
+  font-size: 0.8rem;
+  font-weight: 500;
+}

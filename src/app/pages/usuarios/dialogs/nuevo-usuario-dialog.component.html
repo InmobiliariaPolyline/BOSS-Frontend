@@ -1,0 +1,80 @@
+<div class="pd-card p-0 border-0">
+
+  <!-- HEADER -->
+  <div class="pd-card__header p-4 pb-3 mb-0 d-flex align-items-center justify-content-between border-bottom border-secondary">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-person-plus text-primary fs-4"></i>
+      <div>
+        <h5 class="pd-card__title mb-0">{{estadoEdicion ? 'Actualizar cuenta' : 'Registrar nueva cuenta'}}</h5>
+        <small class="text-secondary">{{estadoEdicion ? 'Modificar los datos de la cuenta.' : 'Registra un nuevo usuario y asígnale un rol de acceso.'}}</small>
+      </div>
+    </div>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="cancelar()"></button>
+  </div>
+
+  <div class="p-4">
+
+    @if (errorMessage) {
+      <div class="alert alert-danger border-0 shadow-sm d-flex align-items-center mb-3" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <div>{{ errorMessage }}</div>
+      </div>
+    }
+
+    <!-- DATOS DE CUENTA -->
+    <div class="d-flex align-items-center gap-2 mb-3 text-primary fw-semibold">
+      <i class="bi bi-shield-lock"></i>
+      <span>Credenciales de acceso</span>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-12">
+        <label class="pd-label">Nombre de Usuario *</label>
+        <input type="text" class="pd-input" [(ngModel)]="usuario.username" (input)="filtrarCaracteres($event)" placeholder="Ej. jperez" required autocomplete="off" />
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-12">
+        <label class="pd-label">Contraseña {{estadoEdicion ? '(dejar en blanco para no modificar)' : '*'}}</label>
+        <input type="password" class="pd-input" [(ngModel)]="usuario.password" placeholder="••••••••" [required]="!estadoEdicion" />
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label class="pd-label">Rol del Sistema *</label>
+        <div class="pd-input-select-wrapper">
+          <select class="pd-input pd-select" [(ngModel)]="selectedRolId" required>
+            <option [ngValue]="null" disabled selected>Seleccione un rol...</option>
+            @for (r of roles; track r.idRol) {
+              <option [value]="r.idRol">{{ r.nombreRol }}</option>
+            }
+          </select>
+          <i class="bi bi-chevron-down pd-select-arrow"></i>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label class="pd-label">Estado de la cuenta</label>
+        <div class="pd-input-select-wrapper">
+          <select class="pd-input pd-select" [(ngModel)]="usuario.estado">
+            <option [ngValue]="true">Activo</option>
+            <option [ngValue]="false">Inactivo</option>
+          </select>
+          <i class="bi bi-chevron-down pd-select-arrow"></i>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="p-4 pt-0 d-flex justify-content-end gap-2 border-top-0">
+    <button type="button" class="pd-btn pd-btn--outline" (click)="cancelar()">Cancelar</button>
+    <button type="button" class="pd-btn pd-btn--confirm d-flex align-items-center gap-1" (click)="registrar()">
+      <i class="bi" [ngClass]="estadoEdicion ? 'bi-save' : 'bi-person-plus'"></i>
+      {{estadoEdicion ? 'Guardar cambios' : 'Registrar cuenta'}}
+    </button>
+  </div>
+</div>

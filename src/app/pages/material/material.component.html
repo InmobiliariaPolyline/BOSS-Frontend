@@ -1,0 +1,210 @@
+<div class="pd-page container-fluid py-4">
+
+  <!-- HEADER -->
+  <header class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <h1 class="page-title">Inventario</h1>
+      <p class="page-subtitle">Materiales, equipos y otros recursos disponibles en obra</p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button class="pd-btn pd-btn--primary" (click)="agregarItem()">
+        <i class="bi bi-plus-lg"></i>
+        Agregar item
+      </button>
+    </div>
+  </header>
+
+  <!-- KPI CARDS -->
+  <section class="row row-cols-1 row-cols-sm-2 row-cols-xl-4 g-3 mb-4">
+    <div class="col">
+      <div class="pd-card h-100 d-flex align-items-center gap-3 p-4">
+        <div class="rounded bg-dark text-white d-flex align-items-center justify-content-center"
+          style="width: 48px; height: 48px;">
+          <i class="bi bi-briefcase fs-4"></i>
+        </div>
+        <div>
+          <span class="text-secondary small d-block">Items totales</span>
+          <span class="h4 fw-bold text-body mb-0">{{ materialesFiltrados().length }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="pd-card h-100 d-flex align-items-center gap-3 p-4">
+        <div class="rounded bg-primary-subtle text-primary d-flex align-items-center justify-content-center"
+          style="width: 48px; height: 48px;">
+          <i class="bi bi-layers fs-4"></i>
+        </div>
+        <div>
+          <span class="text-secondary small d-block">Materiales</span>
+          <span class="h4 fw-bold text-body mb-0">{{ contarCategoria('Materiales') }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="pd-card h-100 d-flex align-items-center gap-3 p-4">
+        <div class="rounded bg-warning-subtle text-warning d-flex align-items-center justify-content-center"
+          style="width: 48px; height: 48px;">
+          <i class="bi bi-tools fs-4"></i>
+        </div>
+        <div>
+          <span class="text-secondary small d-block">Equipos</span>
+          <span class="h4 fw-bold text-body mb-0">{{ contarCategoria('Equipo') }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="col">
+      <div class="pd-card h-100 d-flex align-items-center gap-3 p-4">
+        <div class="rounded bg-success-subtle text-success d-flex align-items-center justify-content-center"
+          style="width: 48px; height: 48px;">
+          <i class="bi bi-currency-dollar fs-4"></i>
+        </div>
+        <div>
+          <span class="text-secondary small d-block">Valor inventario</span>
+          <span class="h4 fw-bold text-body mb-0">S/. {{ valorInventario() | number:'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FILTER CHIPS -->
+  <div class="d-flex flex-wrap gap-2 mb-4">
+    <button class="pd-btn rounded-pill px-3 py-1"
+      [ngClass]="categoriaActiva() === 'Todos' ? 'pd-btn--primary' : 'pd-btn--outline'"
+      (click)="filtrarCategoria('Todos')">
+      Todos <span class="badge bg-secondary-subtle text-secondary ms-1">{{ totalItems() }}</span>
+    </button>
+    <button class="pd-btn rounded-pill px-3 py-1"
+      [ngClass]="categoriaActiva() === 'Materiales' ? 'pd-btn--primary' : 'pd-btn--outline'"
+      (click)="filtrarCategoria('Materiales')">
+      Materiales <span class="badge bg-secondary-subtle text-secondary ms-1">{{ contarCategoria('Materiales') }}</span>
+    </button>
+    <button class="pd-btn rounded-pill px-3 py-1"
+      [ngClass]="categoriaActiva() === 'Equipo' ? 'pd-btn--primary' : 'pd-btn--outline'"
+      (click)="filtrarCategoria('Equipo')">
+      Equipo <span class="badge bg-secondary-subtle text-secondary ms-1">{{ contarCategoria('Equipo') }}</span>
+    </button>
+    <button class="pd-btn rounded-pill px-3 py-1"
+      [ngClass]="categoriaActiva() === 'Otros' ? 'pd-btn--primary' : 'pd-btn--outline'"
+      (click)="filtrarCategoria('Otros')">
+      Otros <span class="badge bg-secondary-subtle text-secondary ms-1">{{ contarCategoria('Otros') }}</span>
+    </button>
+  </div>
+
+  <!-- TABLE CARD -->
+  <div class="pd-card p-0">
+    <div class="pd-card__header p-4 pb-0 mb-4">
+
+      <!-- TABLE HEADER + SEARCH -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-0">
+        <div class="d-flex align-items-center gap-2">
+          <i class="bi bi-bar-chart-steps text-primary fs-4"></i>
+          <h5 class="pd-card__title mb-0">Inventario general</h5>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="pd-input-group" style="width: 300px;">
+            <div class="pd-input-group__prefix bg-transparent border-0 pe-1">
+              <i class="bi bi-search text-secondary"></i>
+            </div>
+            <input type="text" class="pd-input pd-input--prefixed w-100 ps-0" placeholder="Buscar por nombre..."
+              [value]="textoBusqueda()" (input)="onBusqueda($event)">
+          </div>
+
+          <div class="pd-input-select-wrapper" style="width: 200px;">
+            <select class="pd-input pd-select" (change)="onCategoriaSelect($event)">
+              <option value="Todos">Todas las categorías</option>
+              <option value="Materiales">Materiales</option>
+              <option value="Equipo">Equipo</option>
+              <option value="Otros">Otros</option>
+            </select>
+            <i class="bi bi-chevron-down pd-select-arrow"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 pt-0">
+      <!-- TABLE -->
+      <div class="pd-table-container mt-3">
+        <table class="pd-table">
+          <thead>
+            <tr>
+              <th>Nombre del material</th>
+              <th>Categoría</th>
+              <th>Unidad</th>
+              <th>Stock actual</th>
+              <th>P. unitario</th>
+              <th>Fecha compra</th>
+              <th>Estado</th>
+              <th style="width: 100px;"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (e of materialesFiltrados(); track e.idMaterial) {
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="rounded-circle d-inline-block"
+                    [ngClass]="calcularEstadoStock(e.stockActual) === 'OK' ? 'bg-success' : 'bg-warning'"
+                    style="width: 8px; height: 8px;"></span>
+                  <span class="fw-semibold">{{ e.nombreMaterial }}</span>
+                </div>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="getBadgeClass(e.categoria)">
+                  <i class="bi me-1"
+                    [ngClass]="e.categoria === 'Materiales' ? 'bi-layers' : (e.categoria === 'Equipo' ? 'bi-tools' : 'bi-box-seam')"></i>
+                  {{ e.categoria }}
+                </span>
+              </td>
+              <td>{{ e.unidadMedida }}</td>
+              <td [ngClass]="calcularEstadoStock(e.stockActual) !== 'OK' ? 'text-danger fw-bold' : ''">
+                {{ e.stockActual }}
+              </td>
+              <td>S/. {{ e.precioUnitario | number:'1.2-2' }}</td>
+              <td>{{ e.fechaCompra | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <span class="pd-badge"
+                  [ngClass]="calcularEstadoStock(e.stockActual) === 'OK' ? 'pd-badge--success' : 'pd-badge--observed'">
+                  {{ calcularEstadoStock(e.stockActual) }}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex align-items-center gap-1">
+                  <button class="pd-btn pd-btn--outline p-1" style="width: 32px; height: 32px;" (click)="editarItem(e)"
+                    title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="pd-btn pd-btn--outline border-danger text-danger p-1"
+                    style="width: 32px; height: 32px;" (click)="eliminarItem(e)" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="8" class="text-center py-5">
+                <div class="text-secondary fs-1 mb-3">
+                  <i class="bi bi-box"></i>
+                </div>
+                <h5 class="text-secondary">No se encontraron materiales</h5>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+
+    <!-- PAGINATION -->
+    <div class="d-flex justify-content-center p-3 border-top">
+      <ngb-pagination [collectionSize]="totalElements()" [page]="page()" [pageSize]="pageSize()"
+        (pageChange)="onPageChange($event)" [maxSize]="5" [rotate]="true" [boundaryLinks]="true">
+      </ngb-pagination>
+    </div>
+
+  </div>
+
+</div>

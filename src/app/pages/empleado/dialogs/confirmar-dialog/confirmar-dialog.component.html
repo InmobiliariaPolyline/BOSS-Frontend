@@ -1,0 +1,21 @@
+<div class="pd-card p-4 text-center border-0">
+
+  <div class="mb-3">
+    <i class="bi bi-exclamation-triangle text-danger" style="font-size: 3rem;"></i>
+  </div>
+
+  <h2 class="pd-card__title mb-2">¿Eliminar trabajador?</h2>
+  <p class="text-secondary mb-4">
+    Estás a punto de eliminar a <strong>{{ data.nombre }}</strong>.
+    Esta acción no se puede deshacer.
+  </p>
+
+  <div class="d-flex justify-content-center gap-2">
+    <button class="pd-btn pd-btn--outline" (click)="cancelar()">Cancelar</button>
+    <button class="pd-btn pd-btn--confirm bg-danger border-danger" (click)="confirmar()">
+      <i class="bi bi-trash"></i>
+      Eliminar
+    </button>
+  </div>
+
+</div>

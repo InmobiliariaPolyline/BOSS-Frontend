@@ -1,0 +1,91 @@
+<div class="pd-page px-4 py-4">
+  <header class="page-header">
+    <div class="page-header-text">
+      <h1 class="page-title">Caja Chica</h1>
+      <p class="page-subtitle">Gestión de ingresos y egresos menores</p>
+    </div>
+  </header>
+
+  <div class="row g-4">
+    <div class="col-md-6">
+      <div class="pd-card">
+        <h6 class="pd-section__subtitle text-muted mb-2">Saldo actual total</h6>
+        <h4 class="pd-card__title mb-4">S/. {{ saldoCalculado() | number:'1.2-2' }}</h4>
+      <div class="card-body">
+        <div class="resumen-container">
+          <div class="bloque-ingreso">
+            <span>Total ingresos</span>
+            <strong>S/. {{ totalIngresosMonto() | number:'1.2-2' }}</strong>
+            <small class="registro-count text-muted">{{ totalIngresos() }} movimientos</small>
+          </div>
+          <div class="bloque-egreso">
+            <span>Total egresos</span>
+            <strong>S/. {{ totalEgresosMonto() | number:'1.2-2' }}</strong>
+            <small class="registro-count text-muted">{{ totalEgresos() }} movimientos</small>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="pd-card">
+        <h5 class="pd-card__title mb-4">Nuevo movimiento</h5>
+        <form [formGroup]="$form()" (ngSubmit)="CrearGasto()">
+          <div class="mb-3">
+            <label class="pd-label">Categoría</label>
+            <div class="pd-input-select-wrapper">
+              <select class="pd-input pd-select" formControlName="categoriaGasto">
+                <option value="ingreso">Ingreso</option>
+                <option value="egreso">Egreso</option>
+              </select>
+              <i class="bi bi-chevron-down pd-select-arrow"></i>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="pd-label">Concepto</label>
+            <input type="text" class="pd-input" formControlName="concepto" placeholder="Descripción...">
+          </div>
+          <div class="mb-4">
+            <label class="pd-label">Monto (S/.)</label>
+            <input type="number" class="pd-input" formControlName="monto">
+          </div>
+          <button class="pd-btn pd-btn--confirm w-100" type="submit" [disabled]="!$form().valid">
+            <i class="bi bi-plus"></i> Registrar
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="pd-card mt-4 p-0">
+    <div class="pd-card__header p-4 pb-0 mb-0">
+      <h5 class="pd-card__title">Movimientos</h5>
+    </div>
+    <div class="p-4">
+      <div class="pd-table-container">
+        <table class="pd-table">
+          <thead>
+            <tr>
+              <th scope="col">Categoría</th>
+              <th scope="col" class="text-end">Monto</th>
+              <th scope="col">Fecha</th>
+              <th scope="col">Concepto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let g of $gastos()">
+              <td>{{ g.categoriaGasto }}</td>
+              <td class="text-end fw-semibold">S/. {{ g.monto | number:'1.2-2' }}</td>
+              <td>{{ g.fechaGasto | date:'dd/MM/yyyy' }}</td>
+              <td>{{ g.concepto }}</td>
+            </tr>
+            <tr *ngIf="$gastos().length === 0">
+              <td colspan="4" class="text-center text-muted py-4">No hay movimientos registrados.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

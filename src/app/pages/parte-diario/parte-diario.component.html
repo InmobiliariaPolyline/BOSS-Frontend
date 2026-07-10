@@ -1,0 +1,310 @@
+<div class="pd-page">
+    <div class="container-fluid px-4 py-4">
+        <header class="page-header">
+            <div class="page-header-text">
+                <h1 class="page-title">Nuevo Parte Diario</h1>
+                <p class="page-subtitle">Registro de actividades, personal y equipos del día</p>
+            </div>
+        </header>
+        <form [formGroup]="form" (ngSubmit)="operate()" class="pd-card">
+
+            <section class="pd-section">
+                <h2 class="pd-section__title">Datos principales</h2>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="pd-label">Fecha de Informe *</label>
+                        <input type="date" class="pd-input" formControlName="fechaInforme" appFiltroFechas>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="pd-label">Jornada Laboral *</label>
+                        <input type="number" class="pd-input" formControlName="jornadaLaboral"
+                            appFiltroNumeros="decimal">
+                    </div>
+                    <div class="col-12">
+                        <label class="pd-label">Elaborado Por *</label>
+                        <input type="text" class="pd-input" formControlName="elaboradoPor" appFiltroTexto>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pd-section">
+                <h2 class="pd-section__title">Detalle de Avance</h2>
+                <div class="pd-avance-box">
+                    <div class="mb-3">
+                        <label class="pd-label">Partida *</label>
+                        <input type="text" class="pd-input" formControlName="nombreParte" appFiltroTexto
+                            placeholder="Ingrese nombre de la partida...">
+                    </div>
+                    <div class="row g-3 align-items-end mb-3">
+                        <div class="col-md-6">
+                            <label class="pd-label">Cantidad Ejecutada</label>
+                            <input type="number" class="pd-input" formControlName="cantidadEjecutada"
+                                appFiltroNumeros="decimal">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="pd-label">Unidad de Medida</label>
+                            <input type="text" class="pd-input" formControlName="unidadMedida" appFiltroTexto
+                                placeholder="Ej. m2, m3, glb...">
+                        </div>
+                    </div>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-6">
+                            <label class="pd-label">Rendimiento Real</label>
+                            <input type="number" class="pd-input" formControlName="rendimientoReal"
+                                appFiltroNumeros="decimal">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="pd-label">Rendimiento Esperado</label>
+                            <input type="number" class="pd-input" formControlName="rendimientoEsperado"
+                                appFiltroNumeros="decimal">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pd-section" formArrayName="costos">
+                <h2 class="pd-section__title">Control de Costos</h2>
+                <div class="pd-cost-tabs">
+                    <button type="button" class="pd-cost-tab" [class.pd-cost-tab--active]="costoTab() === 'MATERIAL'"
+                        (click)="setCostoTab('MATERIAL')">Materiales</button>
+                    <button type="button" class="pd-cost-tab"
+                        [class.pd-cost-tab--active]="costoTab() === 'MANO_DE_OBRA'"
+                        (click)="setCostoTab('MANO_DE_OBRA')">Mano de Obra</button>
+                    <button type="button" class="pd-cost-tab" [class.pd-cost-tab--active]="costoTab() === 'EQUIPO'"
+                        (click)="setCostoTab('EQUIPO')">Equipos</button>
+                    <button type="button" class="pd-cost-tab" [class.pd-cost-tab--active]="costoTab() === 'OTROS'"
+                        (click)="setCostoTab('OTROS')">Otros</button>
+                </div>
+
+                <div class="pd-cost-form mt-4 mb-3">
+                    <div class="pd-cost-form__header">
+                        <span>Nuevo registro</span>
+                    </div>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-5">
+                            <label class="pd-label">Descripción</label>
+
+                            @if (costoTab() === 'MATERIAL' || costoTab() === 'EQUIPO' || costoTab() === 'OTROS') {
+                            <div class="position-relative">
+                                <input type="text" class="pd-input"
+                                    [formControl]="nuevoCostoForm.controls.searchMaterial"
+                                    placeholder="{{ costoTab() === 'MATERIAL' ? 'Escriba para buscar material...' : costoTab() === 'EQUIPO' ? 'Escriba para buscar equipo...' : 'Escriba para buscar recurso...' }}"
+                                    (focus)="showMaterialDropdown.set(true)" (blur)="showMaterialDropdown.set(false)"
+                                    autocomplete="off" appFiltroTexto>
+                                @if (showMaterialDropdown() && filteredMateriales().length > 0) {
+                                <ul class="dropdown-menu show w-100 position-absolute"
+                                    style="max-height: 250px; overflow-y: auto; z-index: 1000; top: 100%; margin-top: 2px;">
+                                    @for (mat of filteredMateriales(); track mat.idMaterial) {
+                                    <li><a class="dropdown-item py-2" href="javascript:void(0)"
+                                            (mousedown)="selectMaterial(mat)">
+                                            <div class="d-flex justify-content-between align-items-center w-100" style="gap: 12px; min-width: 0;">
+                                                <span class="text-truncate" style="min-width: 0; flex: 1;">
+                                                    <strong>{{ mat.nombreMaterial }}</strong>
+                                                </span>
+                                                <span class="badge bg-secondary flex-shrink-0">Stock: {{mat.stockActual}} unidades</span>
+                                            </div>
+                                        </a></li>
+                                    }
+                                </ul>
+                                }
+                            </div>
+                            } @else if (costoTab() === 'MANO_DE_OBRA') {
+                            <div class="position-relative">
+                                <input type="text" class="pd-input"
+                                    [formControl]="nuevoCostoForm.controls.searchEmpleado"
+                                    placeholder="Escriba para buscar empleado..."
+                                    (focus)="showEmpleadoDropdown.set(true)" (blur)="showEmpleadoDropdown.set(false)"
+                                    autocomplete="off" appFiltroTexto>
+                                @if (showEmpleadoDropdown() && filteredEmpleados().length > 0) {
+                                <ul class="dropdown-menu show w-100 position-absolute"
+                                    style="max-height: 250px; overflow-y: auto; z-index: 1000; top: 100%; margin-top: 2px;">
+                                    @for (emp of filteredEmpleados(); track emp.idEmpleado) {
+                                    <li><a class="dropdown-item py-2" href="javascript:void(0)"
+                                            (mousedown)="selectEmpleado(emp)">
+                                            <strong>{{ emp.nombres }} {{ emp.apellidos }}</strong> <small
+                                                class="text-muted d-block">{{emp.cargo}}</small>
+                                        </a></li>
+                                    }
+                                </ul>
+                                }
+                            </div>
+                            }
+                        </div>
+                        <div class="col-md-2">
+                            <label class="pd-label">Cantidad</label>
+                            <input type="number" class="pd-input text-center"
+                                [formControl]="nuevoCostoForm.controls.cantidad" placeholder="1"
+                                [readonly]="costoTab() === 'MANO_DE_OBRA'" appFiltroNumeros="decimal">
+                        </div>
+                        <div class="col-md-3">
+                            <label class="pd-label">Precio Unitario</label>
+                            <div class="pd-input-group">
+                                <span class="pd-input-group__prefix">S/</span>
+                                <input type="number" class="pd-input pd-input--prefixed"
+                                    [formControl]="nuevoCostoForm.controls.costoUnitario" placeholder="0"
+                                    [readonly]="costoTab() === 'MATERIAL' || costoTab() === 'EQUIPO' || costoTab() === 'OTROS'"
+                                    appFiltroNumeros="decimal">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="button" class="pd-btn pd-btn--confirm" (click)="addCosto()">
+                                <span class="material-icons">check_circle</span>
+                                Confirmar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                @if (hasCostos(costoTab())) {
+                <div class="pd-table-container">
+                    <table class="pd-table">
+                        <thead>
+                            <tr>
+                                <th>Descripción</th>
+                                <th>Cant.</th>
+                                <th>P.U.</th>
+                                <th>Importe</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (costo of $f()['costos'].controls; track costo; let i = $index) {
+                            @if (costo.get('tipo')?.value === costoTab()) {
+                            <tr>
+                                <td class="align-middle">{{ $any(costo.value).descripcion }}</td>
+                                <td class="align-middle">{{ $any(costo.value).cantidad }}</td>
+                                <td class="align-middle">{{ $any(costo.value).costoUnitario | currency:'S/' }}</td>
+                                <td class="align-middle">{{ ($any(costo.value).cantidad *
+                                    $any(costo.value).costoUnitario) | currency:'S/' }}</td>
+                                <td class="align-middle text-end">
+                                    <button type="button" class="btn btn-sm btn-outline-danger border-0"
+                                        (click)="removeCosto(i)" title="Eliminar">
+                                        <span class="material-icons" style="font-size: 1.2rem;">delete</span>
+                                    </button>
+                                </td>
+                            </tr>
+                            }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+                }
+            </section>
+
+            <section class="pd-section mt-4">
+                <h2 class="pd-section__title">Resumen de Costos</h2>
+                <p class="text-muted mb-4" style="font-size: 0.9rem;">Totales calculados automáticamente desde los
+                    registros confirmados</p>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6 col-lg">
+                        <div class="pd-card h-100 p-3">
+                            <div class="d-flex align-items-center mb-2 text-secondary">
+                                <i class="bi bi-box-seam text-primary me-2 fs-5"></i>
+                                <span class="small">Materiales</span>
+                            </div>
+                            <div class="fs-4 fw-bold text-body">S/ {{ totales().MATERIAL.total | number:'1.2-2' }}</div>
+                            <div class="small text-secondary">{{ totales().MATERIAL.count }} registro<ng-container
+                                    *ngIf="totales().MATERIAL.count !== 1">s</ng-container></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg">
+                        <div class="pd-card h-100 p-3">
+                            <div class="d-flex align-items-center mb-2 text-secondary">
+                                <i class="bi bi-person-gear text-warning me-2 fs-5"></i>
+                                <span class="small">Mano de Obra</span>
+                            </div>
+                            <div class="fs-4 fw-bold text-body">S/ {{ totales().MANO_DE_OBRA.total | number:'1.2-2' }}
+                            </div>
+                            <div class="small text-secondary">{{ totales().MANO_DE_OBRA.count }} registro<ng-container
+                                    *ngIf="totales().MANO_DE_OBRA.count !== 1">s</ng-container></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg">
+                        <div class="pd-card h-100 p-3">
+                            <div class="d-flex align-items-center mb-2 text-secondary">
+                                <i class="bi bi-tools text-info me-2 fs-5"></i>
+                                <span class="small">Equipos</span>
+                            </div>
+                            <div class="fs-4 fw-bold text-body">S/ {{ totales().EQUIPO.total | number:'1.2-2' }}</div>
+                            <div class="small text-secondary">{{ totales().EQUIPO.count }} registro<ng-container
+                                    *ngIf="totales().EQUIPO.count !== 1">s</ng-container></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg">
+                        <div class="pd-card h-100 p-3">
+                            <div class="d-flex align-items-center mb-2 text-secondary">
+                                <i class="bi bi-boxes text-secondary me-2 fs-5"></i>
+                                <span class="small">Otros</span>
+                            </div>
+                            <div class="fs-4 fw-bold text-body">S/ {{ totales().OTROS.total | number:'1.2-2' }}</div>
+                            <div class="small text-secondary">{{ totales().OTROS.count }} registro<ng-container
+                                    *ngIf="totales().OTROS.count !== 1">s</ng-container></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 col-lg">
+                        <div class="pd-card h-100 p-3 bg-primary bg-opacity-10 border border-primary border-opacity-25">
+                            <div class="d-flex align-items-center mb-2 text-primary">
+                                <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                                <span class="small fw-bold">Total General</span>
+                            </div>
+                            <div class="fs-4 fw-bold text-primary">S/ {{ totales().total | number:'1.2-2' }}</div>
+                            <div class="small text-secondary">{{ totales().count }} ítems</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="pd-section">
+                <fieldset class="pd-upload-fieldset">
+                    <legend class="pd-upload-legend">Evidencias fotográficas</legend>
+                    <div class="pd-upload" (click)="fileInput.click()">
+                        <input type="file" #fileInput class="pd-upload__input" multiple accept="image/*"
+                            (change)="onFilesSelected($event)" hidden>
+                        <i class="bi bi-cloud-upload fs-1 d-block mb-2 text-secondary"></i>
+                        <p>Haz clic para subir</p>
+                    </div>
+
+                    @if (fotos().length > 0) {
+                    <div class="mt-4 row g-3">
+                        @for (foto of fotos(); track foto.urlCloud) {
+                        <div class="col-md-3 col-sm-4 col-6">
+                            <div class="position-relative border rounded p-2 text-center h-100 d-flex flex-column align-items-center justify-content-center pd-card"
+                                style="background-color: var(--pd-bg-secondary);">
+                                <button type="button"
+                                    class="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 rounded-circle p-0"
+                                    style="width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; z-index: 10;"
+                                    (click)="removeFoto(foto)" title="Eliminar foto">
+                                    <i class="bi bi-x"></i>
+                                </button>
+                                <div class="w-100 mb-2 overflow-hidden rounded d-flex align-items-center justify-content-center bg-dark"
+                                    style="height: 120px;">
+                                    <img [src]="foto.urlCloud" [alt]="foto.descripcion" class="img-fluid"
+                                        style="max-height: 100%; object-fit: cover;">
+                                </div>
+                                <div class="text-truncate w-100 small text-muted" [title]="foto.descripcion">
+                                    {{ foto.descripcion }}
+                                </div>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                    }
+                </fieldset>
+            </section>
+
+            <section class="pd-section mt-4">
+                <h2 class="pd-section__title">Observaciones</h2>
+                <div class="row">
+                    <div class="col-12">
+                        <textarea class="pd-input" formControlName="observaciones" rows="4"
+                            placeholder="Ingrese las observaciones del parte diario..."></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <div class="pd-form-actions mt-4">
+                <button type="submit" class="pd-btn pd-btn--primary">Guardar Parte</button>
+            </div>
+        </form>
+    </div>
+</div>

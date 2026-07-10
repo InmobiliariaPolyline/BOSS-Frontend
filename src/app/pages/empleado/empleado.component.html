@@ -1,0 +1,108 @@
+<div class="pd-page container-fluid py-4">
+
+  <!-- HEADER -->
+  <header class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <h1 class="page-title">Directorio de Trabajadores</h1>
+      <p class="page-subtitle">{{ empleados().length }} trabajadores registrados en obra</p>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <div class="pd-input-group" style="width: 320px;">
+        <div class="pd-input-group__prefix bg-transparent border-0 pe-1">
+          <i class="bi bi-search text-secondary"></i>
+        </div>
+        <input
+          type="text"
+          class="pd-input pd-input--prefixed w-100 ps-0"
+          [ngModel]="filtro()"
+          (ngModelChange)="filtro.set($event)"
+          placeholder="Buscar por nombre o DNI"
+        />
+      </div>
+
+      <button class="pd-btn pd-btn--primary" (click)="abrirNuevo()">
+        <i class="bi bi-person-plus-fill"></i>
+        Nuevo
+      </button>
+    </div>
+  </header>
+
+  <!-- GRID DE TARJETAS -->
+  <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+
+    @for (empleado of empleadosFiltrados(); track empleado.dni) {
+
+      <div class="col">
+        <div class="pd-card h-100 p-0">
+          <div class="p-4 d-flex align-items-start gap-3">
+
+            <!-- AVATAR PLACEHOLDER -->
+            <div class="rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center flex-shrink-0" style="width: 56px; height: 56px;">
+              <i class="bi bi-person fs-3"></i>
+            </div>
+
+            <div class="flex-grow-1 min-w-0">
+              <h5 class="pd-card__title text-truncate mb-1">{{ empleado.nombres }} {{ empleado.apellidos }}</h5>
+
+              <p class="text-secondary small mb-2 d-flex align-items-center gap-1">
+                <i class="bi bi-card-text text-secondary"></i>
+                DNI: {{ empleado.dni }}
+              </p>
+
+              <!-- BADGE DE ESTADO -->
+              <span class="pd-badge"
+                  [ngClass]="empleado.estado ? 'pd-badge--success' : 'pd-badge--observed'">
+                  {{ empleado.estado ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+          </div>
+
+          <hr class="my-0 border-secondary">
+
+          <div class="px-4 py-3">
+            <span class="pd-badge pd-badge--neutral mb-2">{{ empleado.cargo }}</span>
+            <p class="text-secondary small mb-0 d-flex align-items-center gap-1">
+              <i class="bi bi-telephone text-secondary"></i>
+              Tel: {{ empleado.telefono ? empleado.telefono : 'Sin teléfono registrado' }}
+            </p>
+          </div>
+
+          <div class="px-4 pb-4 pt-0 d-flex align-items-center justify-content-between gap-2">
+            <!-- BOTON CONTACTAR -->
+            <button class="pd-btn pd-btn--outline flex-grow-1 justify-content-center" style="font-size: 0.85rem;" (click)="contactar(empleado)">
+              <i class="bi bi-envelope"></i>
+              Contactar
+            </button>
+
+            <!-- ACCIONES -->
+            <div class="d-flex align-items-center gap-1">
+              <!-- BOTON EDITAR O ACTUALIZAR -->
+              <button class="pd-btn pd-btn--outline p-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" (click)="Editar(empleado)" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+
+              <!-- BOTON ELIMINAR -->
+              <button class="pd-btn pd-btn--outline border-danger text-danger p-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" (click)="eliminar(empleado)" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
+
+              <!-- BOTON WHATSAPP -->
+              <button class="pd-btn bg-success text-white border-0 p-1 d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" (click)="whatsapp(empleado)" title="WhatsApp">
+                <i class="bi bi-whatsapp"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    } @empty {
+      <div class="col-12 text-center py-5">
+        <div class="text-secondary fs-1 mb-3">
+          <i class="bi bi-people"></i>
+        </div>
+        <h5 class="text-secondary">No se encontraron trabajadores</h5>
+      </div>
+    }
+  </div>
+</div>

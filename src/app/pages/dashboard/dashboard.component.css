@@ -1,0 +1,44 @@
+/* Estilos de gráficos específicos de Dashboard */
+.line-chart-svg {
+  min-height: 250px;
+}
+.chart-container {
+  overflow: visible;
+}
+.chart-grid line {
+  stroke: var(--color-border, #e2e8f0);
+}
+.chart-grid text {
+  font-size: 11px;
+  fill: var(--text-muted, #64748b);
+  font-weight: 500;
+  text-anchor: end;
+}
+.chart-axis-x text {
+  font-size: 11px;
+  fill: var(--text-muted, #64748b);
+  text-anchor: middle;
+  font-weight: 500;
+}
+
+/* Tooltip styles */
+.tooltip-box-shadow {
+  fill: var(--bg-card, #ffffff);
+  stroke: var(--color-border, #e2e8f0);
+}
+.tooltip-title-text {
+  font-size: 12px;
+  font-weight: 600;
+  fill: var(--text-main, #1e293b);
+}
+.tooltip-value-text {
+  font-size: 11px;
+  font-weight: 500;
+}
+.tooltip-value-text--valorizado {
+  fill: var(--color-info, #2563eb);
+}
+.tooltip-value-text--real {
+  fill: var(--color-accent, #ea580c);
+}
+

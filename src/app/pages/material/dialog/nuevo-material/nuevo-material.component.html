@@ -1,0 +1,81 @@
+<div class="pd-card p-0 border-0">
+
+  <!-- HEADER -->
+  <div class="pd-card__header p-4 pb-3 mb-0 d-flex align-items-center justify-content-between border-bottom border-secondary">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-box-seam text-primary fs-4"></i>
+      <div>
+        <h5 class="pd-card__title mb-0">{{ estadoEdicion ? 'Editar item' : 'Agregar item al inventario' }}</h5>
+        <small class="text-secondary">{{ estadoEdicion ? 'Modifica los datos del material, equipo u otro recurso.' : 'Completa los datos del material, equipo u otro recurso.' }}</small>
+      </div>
+    </div>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="cancelar()"></button>
+  </div>
+
+  <!-- BODY -->
+  <div class="p-4">
+
+    <!-- Nombre -->
+    <div class="mb-3">
+      <label class="pd-label">Nombre del material *</label>
+      <input type="text" class="pd-input" [(ngModel)]="material.nombreMaterial" placeholder="Ej. Cemento Sol Tipo I" required appFiltroTexto />
+    </div>
+
+    <!-- Categoría + Unidad de medida -->
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label class="pd-label">Categoría *</label>
+        <div class="pd-input-select-wrapper">
+          <select class="pd-input pd-select" [(ngModel)]="material.categoria">
+            @for (c of categorias; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+          <i class="bi bi-chevron-down pd-select-arrow"></i>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label class="pd-label">Unidad de medida</label>
+        <input type="text" class="pd-input" [(ngModel)]="material.unidadMedida" placeholder="und, bolsa, m³..." />
+      </div>
+    </div>
+
+    <!-- Stock + Precio -->
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label class="pd-label">Stock actual *</label>
+        <input type="number" class="pd-input"
+          [(ngModel)]="material.stockActual"
+          placeholder="0"
+          min="0" required />
+      </div>
+
+      <div class="col-md-6">
+        <label class="pd-label">Precio unitario (S/.)</label>
+        <input type="number" class="pd-input"
+          [(ngModel)]="material.precioUnitario"
+          placeholder="0.00"
+          min="0"
+          step="0.01" />
+      </div>
+    </div>
+
+    <!-- Fecha de compra -->
+    <div class="mb-3">
+      <label class="pd-label">Fecha de compra</label>
+      <input type="date" class="pd-input" [(ngModel)]="material.fechaCompra" appFiltroFechas />
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="p-4 pt-0 d-flex justify-content-end gap-2 border-top-0">
+    <button type="button" class="pd-btn pd-btn--outline" (click)="cancelar()">Cancelar</button>
+    <button type="button" class="pd-btn pd-btn--confirm d-flex align-items-center gap-1" (click)="guardar()">
+      <i class="bi" [ngClass]="estadoEdicion ? 'bi-save' : 'bi-plus-lg'"></i>
+      {{ estadoEdicion ? 'Guardar cambios' : 'Agregar al inventario' }}
+    </button>
+  </div>
+
+</div>

@@ -1,0 +1,152 @@
+<div class="pd-page container-fluid py-4">
+
+  <!-- ── Header ──────────────────────────────────────── -->
+  <header class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <h1 class="page-title">Reportes</h1>
+      <p class="page-subtitle">
+        Indicadores consolidados de la obra
+        @if ($obra(); as obra) {
+          — <strong>{{ obra.nombreObra }}</strong>
+        }
+      </p>
+    </div>
+    <div class="d-flex align-items-center gap-2">
+      <button class="pd-btn pd-btn--outline" (click)="exportExcel()">
+        <i class="bi bi-file-earmark-excel"></i> Excel
+      </button>
+      <button class="pd-btn pd-btn--outline text-danger border-danger" (click)="exportPDF()">
+        <i class="bi bi-file-earmark-pdf"></i> PDF
+      </button>
+      <button class="pd-btn pd-btn--confirm bg-success border-success text-white" (click)="shareWhatsApp()">
+        <i class="bi bi-whatsapp"></i> WhatsApp
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Loading ─────────────────────────────────────── -->
+  @if ($loading()) {
+    <div class="d-flex flex-column align-items-center justify-content-center py-5">
+      <div class="spinner-border text-primary mb-2" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <span class="text-secondary">Cargando datos de la obra...</span>
+    </div>
+  }
+
+  <!-- ── Sin obra seleccionada ───────────────────────── -->
+  @if (!$obra() && !$loading()) {
+    <div class="text-center py-5">
+      <i class="bi bi-building text-secondary fs-1 mb-3 d-block"></i>
+      <p class="text-secondary">Selecciona una obra para ver los reportes</p>
+    </div>
+  }
+
+  @if ($obra() && !$loading()) {
+
+    <!-- ── Charts ─────────────────────────────────────── -->
+    <div class="row g-4 mb-4">
+
+      <!-- Horas Hombre por Semana -->
+      <div class="col-md-6">
+        <div class="pd-card h-100 p-0">
+          <div class="p-4">
+            <h5 class="pd-card__title mb-4">Horas Hombre por Semana</h5>
+
+            @if ($horas().length === 0) {
+              <p class="text-secondary small">Sin datos registrados</p>
+            } @else {
+              <div class="chart-bar-area">
+                <div class="y-axis">
+                  @for (tick of [1400,1050,700,350,0]; track tick) {
+                    <span>{{ tick }}</span>
+                  }
+                </div>
+                <div class="bars-container">
+                  <div class="grid-lines">
+                    @for (tick of [1,2,3,4,5]; track tick) {
+                      <div class="grid-line"></div>
+                    }
+                  </div>
+                  <div class="bars">
+                    @for (item of $horas(); track item.semana) {
+                      <div class="bar-col">
+                        <div
+                          class="bar"
+                          [style.height.%]="getBarHeight(item.horas)"
+                          [title]="item.horas + ' HH'">
+                        </div>
+                        <span class="x-label">{{ item.semana }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Distribución de Costos -->
+      <div class="col-md-6">
+        <div class="pd-card h-100 p-0">
+          <div class="p-4">
+            <h5 class="pd-card__title mb-4">Distribución de Costos</h5>
+
+            @if ($costos().length === 0) {
+              <p class="text-secondary small">Sin costos registrados</p>
+            } @else {
+              <div class="donut-area">
+                <svg viewBox="0 0 200 200" class="donut-svg">
+                  @for (item of $costos(); track item.tipo; let i = $index) {
+                    <circle
+                      cx="100" cy="100" r="70"
+                      fill="none"
+                      [attr.stroke]="item.color"
+                      stroke-width="38"
+                      [attr.stroke-dasharray]="getSegmentoDash(item.porcentaje)"
+                      [attr.stroke-dashoffset]="getSegmentoOffset(i)"
+                      [title]="item.label + ': ' + item.porcentaje + '%'"
+                      class="donut-seg"
+                    />
+                  }
+                  <circle cx="100" cy="100" r="51" fill="white" />
+                </svg>
+                <div class="leyenda">
+                  @for (item of $costos(); track item.tipo) {
+                    <div class="leyenda-item">
+                      <span class="leyenda-dot" [style.background]="item.color"></span>
+                      <span class="leyenda-label">{{ item.label }}</span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ── Reportes disponibles ────────────────────────── -->
+    <div class="pd-card p-0">
+      <div class="p-4">
+        <h5 class="pd-card__title mb-4">Reportes disponibles</h5>
+        <div class="row row-cols-1 row-cols-md-2 g-3">
+          @for (r of reportes; track r.id) {
+            <div class="col">
+              <div class="d-flex align-items-center justify-content-between p-3 border rounded border-secondary">
+                <span class="fw-semibold text-truncate me-2 text-body">{{ r.nombre }}</span>
+                <button class="pd-btn pd-btn--primary py-1 px-3" (click)="generarReporte(r.id)">
+                  <i class="bi bi-file-earmark-arrow-down"></i>
+                  Generar
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+  }
+</div>

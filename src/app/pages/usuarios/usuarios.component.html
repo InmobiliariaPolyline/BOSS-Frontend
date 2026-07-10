@@ -1,0 +1,114 @@
+<div class="pd-page container-fluid py-4">
+
+  <!-- HEADER -->
+  <header class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <h1 class="page-title">Gestión de Usuarios</h1>
+      <p class="page-subtitle">{{ usuarios().length }} cuentas registradas en el sistema</p>
+    </div>
+
+    <div class="d-flex align-items-center gap-3">
+      <div class="pd-input-group" style="width: 320px;">
+        <div class="pd-input-group__prefix bg-transparent border-0 pe-1">
+          <i class="bi bi-search text-secondary"></i>
+        </div>
+        <input type="text" class="pd-input pd-input--prefixed w-100 ps-0" [ngModel]="filtro()"
+          (ngModelChange)="filtro.set($event)" placeholder="Buscar por usuario o rol..." />
+      </div>
+
+      <button class="pd-btn pd-btn--primary" (click)="abrirNuevo()">
+        <i class="bi bi-person-plus-fill"></i>
+        Nuevo Usuario
+      </button>
+    </div>
+  </header>
+
+  <!-- TABLE CARD -->
+  <div class="pd-card p-0">
+    <div class="pd-card__header p-4 pb-0 mb-4">
+      <div class="d-flex align-items-center gap-2">
+        <i class="bi bi-people text-primary fs-4"></i>
+        <h5 class="pd-card__title mb-0">Cuentas y Accesos</h5>
+      </div>
+    </div>
+
+    <div class="p-4 pt-0">
+      <div class="pd-table-container">
+        <table class="pd-table">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Roles / Permisos</th>
+              <th>Estado</th>
+              <th style="width: 200px; text-align: right;">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (usuario of usuariosFiltrados(); track usuario.idUsuario) {
+            <tr>
+              <td>
+                <div class="d-flex align-items-center gap-3">
+                  <div
+                    class="avatar-placeholder rounded-circle bg-primary-subtle text-primary d-flex align-items-center justify-content-center fw-bold"
+                    style="width: 36px; height: 36px; font-size: 0.9rem;">
+                    {{ usuario.username.substring(0, 2).toUpperCase() }}
+                  </div>
+                  <div>
+                    <span class="fw-semibold text-body d-block">{{ usuario.username }}</span>
+                    <small class="text-secondary">ID: {{ usuario.idUsuario }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <div class="d-flex flex-wrap gap-1">
+                  @for (rol of usuario.roles; track rol.idRol) {
+                  <span class="badge px-2 py-1.5 rounded" [ngClass]="getRoleBadgeClass(rol.nombreRol)">
+                    <i class="bi bi-shield-check me-1"></i>{{ rol.nombreRol }}
+                  </span>
+                  } @empty {
+                  <span class="text-secondary small">Sin rol asignado</span>
+                  }
+                </div>
+              </td>
+              <td>
+                <span class="pd-badge" [ngClass]="usuario.estado ? 'pd-badge--success' : 'pd-badge--observed'">
+                  {{ usuario.estado ? 'Activo' : 'Inactivo' }}
+                </span>
+              </td>
+              <td>
+                <div class="d-flex align-items-center justify-content-end gap-2">
+                  <button class="pd-btn btn-sm"
+                    [ngClass]="usuario.estado ? 'pd-btn--outline border-danger text-danger' : 'pd-btn--outline border-success text-success'"
+                    (click)="toggleEstado(usuario)" [title]="usuario.estado ? 'Desactivar Cuenta' : 'Activar Cuenta'">
+                    <i class="bi" [ngClass]="usuario.estado ? 'bi-person-x' : 'bi-person-check'"></i>
+                    <span>{{ usuario.estado ? 'Desactivar' : 'Activar' }}</span>
+                  </button>
+
+                  <button class="pd-btn pd-btn--outline p-1" style="width: 32px; height: 32px;"
+                    (click)="editar(usuario)" title="Editar">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+
+                  <button class="pd-btn pd-btn--outline border-danger text-danger p-1"
+                    style="width: 32px; height: 32px;" (click)="eliminar(usuario)" title="Eliminar">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            } @empty {
+            <tr>
+              <td colspan="4" class="text-center py-5">
+                <div class="text-secondary fs-1 mb-3">
+                  <i class="bi bi-people"></i>
+                </div>
+                <h5 class="text-secondary">No se encontraron cuentas de usuario</h5>
+              </td>
+            </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

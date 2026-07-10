@@ -1,0 +1,1039 @@
+/* ═══════════════════════════════════════════════════════════════════
+   PARTE DIARIO – Component Styles (Rediseño según mockup)
+   Paleta: azul oscuro (#1B2A4A) como primario, acentos por categoría
+   ═══════════════════════════════════════════════════════════════════ */
+
+:host {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+
+  /* Categoría colors */
+  --pd-mat: #3B82F6;
+  --pd-mat-bg: #EFF6FF;
+  --pd-mano: #F59E0B;
+  --pd-mano-bg: #FFFBEB;
+  --pd-equip: #8B5CF6;
+  --pd-equip-bg: #F5F3FF;
+  --pd-otros: #10B981;
+  --pd-otros-bg: #ECFDF5;
+
+  /* Status colors */
+  
+  
+  
+  
+  
+  
+
+  /* Design tokens */
+  --pd-radius: 12px;
+  --pd-radius-sm: 8px;
+  --pd-radius-xs: 6px;
+  --pd-shadow: 0 1px 3px rgba(0, 0, 0, .04), 0 1px 2px rgba(0, 0, 0, .03);
+  --pd-shadow-md: 0 4px 12px rgba(0, 0, 0, .06);
+  --pd-transition: .2s ease;
+
+  display: block;
+  background: var(--bg-main);
+  min-height: 100vh;
+}
+
+/* ───── Page ───── */
+.pd-page {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* ───── Card base ───── */
+.pd-card {
+  background: var(--bg-card);
+  border-radius: var(--pd-radius);
+  box-shadow: var(--pd-shadow);
+  padding: 32px;
+  border: 1px solid var(--color-border);
+}
+
+.pd-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 28px;
+}
+
+.pd-card__header-icon {
+  font-size: 22px;
+  color: var(--text-light);
+}
+
+.pd-card__title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+/* ───── Sections ───── */
+.pd-section {
+  margin-bottom: 32px;
+}
+
+.pd-section:last-of-type {
+  margin-bottom: 24px;
+}
+
+.pd-section__title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 4px;
+}
+
+.pd-section__subtitle {
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin: 0 0 18px;
+}
+
+/* ───── Form elements ───── */
+.pd-label {
+  display: block;
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text-main);
+  margin-bottom: 6px;
+}
+
+.pd-required {
+  color: var(--color-danger);
+}
+
+.pd-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: .875rem;
+  font-family: inherit;
+  color: var(--text-main);
+  background: var(--bg-card);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--pd-radius-sm);
+  outline: none;
+  transition: border-color var(--pd-transition), box-shadow var(--pd-transition);
+}
+
+.pd-input::placeholder {
+  color: var(--text-muted);
+}
+
+.pd-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(27, 42, 74, .08);
+}
+
+.pd-input--readonly {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-main);
+  cursor: default;
+}
+
+.pd-input__icon {
+  font-size: 18px;
+  color: var(--text-muted);
+}
+
+.pd-input__text {
+  font-size: .875rem;
+  color: var(--text-main);
+}
+
+.pd-input--with-lock {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.pd-input__lock-icon {
+  font-size: 16px;
+  color: var(--text-muted);
+}
+
+.pd-hint {
+  display: block;
+  font-size: .7rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.pd-select {
+  appearance: none;
+  padding-right: 36px;
+  cursor: pointer;
+}
+
+.pd-input-select-wrapper {
+  position: relative;
+}
+
+.pd-input-select-wrapper .pd-select-arrow {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.pd-select-arrow {
+  font-size: 20px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.pd-textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* ───── Avance Box ───── */
+.pd-avance-box {
+  background: var(--bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pd-radius-sm);
+  padding: 20px;
+}
+
+/* Info labels (Unidad, Rendimiento, HH/unidad) */
+.pd-info-label {
+  display: block;
+  font-size: .75rem;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.pd-info-value {
+  display: block;
+  font-size: .9rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* ───── Cost Tabs ───── */
+.pd-cost-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  background: var(--bg-main);
+  border: 1.5px solid var(--color-border);
+  border-radius: 30px;
+  padding: 4px;
+  overflow: hidden;
+}
+
+.pd-cost-tab {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px 16px;
+  font-size: .85rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--text-light);
+  background: transparent;
+  border: none;
+  border-radius: 26px;
+  cursor: pointer;
+  transition: all var(--pd-transition);
+  white-space: nowrap;
+}
+
+.pd-cost-tab .material-icons {
+  font-size: 18px;
+}
+
+.pd-cost-tab:hover {
+  color: var(--color-primary);
+  background: var(--bg-card);
+}
+
+.pd-cost-tab--active {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  box-shadow: 0 2px 6px rgba(27, 42, 74, .2);
+}
+
+.pd-cost-tab--active:hover {
+  background: var(--color-primary-hover);
+  color: var(--text-inverse);
+}
+
+.pd-cost-tab__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  font-size: .7rem;
+  font-weight: 700;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, .08);
+  color: inherit;
+}
+
+.pd-cost-tab--active .pd-cost-tab__badge {
+  background: rgba(255, 255, 255, .3);
+}
+
+/* ───── Cost Form ───── */
+.pd-cost-form {
+  background: var(--bg-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pd-radius-sm);
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.pd-cost-form__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--pd-mat);
+  margin-bottom: 16px;
+}
+
+.pd-cost-form__header .material-icons {
+  font-size: 18px;
+}
+
+/* Category-specific header colors */
+.pd-cost-form__header--mat {
+  color: var(--pd-mat);
+}
+
+.pd-cost-form__header--mano {
+  color: var(--pd-mano);
+}
+
+.pd-cost-form__header--equip {
+  color: var(--pd-equip);
+}
+
+.pd-cost-form__header--otros {
+  color: var(--pd-otros);
+}
+
+.pd-cost-form__importe {
+  text-align: right;
+  font-size: .8rem;
+  color: var(--text-muted);
+  margin-top: 10px;
+  font-weight: 500;
+}
+
+/* ───── Input group (S/ prefix) ───── */
+.pd-input-group {
+  display: flex;
+  align-items: stretch;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--pd-radius-sm);
+  overflow: hidden;
+  background: var(--bg-card);
+  transition: border-color var(--pd-transition), box-shadow var(--pd-transition);
+}
+
+.pd-input-group:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(27, 42, 74, .08);
+}
+
+.pd-input-group__prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 10px;
+  font-size: .85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: var(--bg-main);
+  border-right: 1px solid var(--color-border);
+}
+
+.pd-input--prefixed {
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.pd-input--prefixed:focus {
+  box-shadow: none !important;
+}
+
+/* ───── Cost Summary Table ───── */
+.pd-cost-summary-table {
+  border: 1px solid var(--color-border);
+  border-radius: var(--pd-radius-sm);
+  overflow-x: auto;
+  margin-bottom: 20px;
+}
+
+.pd-cost-summary-table__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: var(--bg-main);
+  border-bottom: 1px solid var(--color-border);
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: .3px;
+}
+
+.pd-cost-summary-table .table {
+  font-size: .85rem;
+  margin: 0;
+}
+
+.pd-cost-summary-table .table thead th {
+  font-size: .75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .3px;
+  color: var(--text-muted);
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--color-border);
+  padding: 10px 16px;
+}
+
+.pd-cost-summary-table .table tbody td {
+  padding: 12px 16px;
+  color: var(--text-main);
+  vertical-align: middle;
+}
+
+/* ───── Cost Summary Cards ───── */
+.pd-cost-cards {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.pd-cost-card {
+  flex: 1;
+  min-width: 120px;
+  background: var(--bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pd-radius-sm);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pd-cost-card__header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.pd-cost-card__icon {
+  font-size: 16px;
+}
+
+.pd-cost-card__icon--materiales {
+  color: var(--pd-mat);
+}
+
+.pd-cost-card__icon--mano {
+  color: var(--pd-mano);
+}
+
+.pd-cost-card__icon--equipos {
+  color: var(--pd-equip);
+}
+
+.pd-cost-card__icon--otros {
+  color: var(--pd-otros);
+}
+
+.pd-cost-card__label {
+  font-size: .75rem;
+  font-weight: 500;
+  color: var(--text-light);
+}
+
+.pd-cost-card__amount {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.pd-cost-card__count {
+  font-size: .7rem;
+  color: var(--text-muted);
+}
+
+.pd-cost-card--total {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+.pd-cost-card--total .pd-cost-card__icon,
+.pd-cost-card--total .pd-cost-card__label {
+  color: rgba(255, 255, 255, .7);
+}
+
+.pd-cost-card--total .pd-cost-card__amount {
+  color: var(--text-inverse);
+}
+
+.pd-cost-card--total .pd-cost-card__count {
+  color: rgba(255, 255, 255, .6);
+}
+
+/* ───── Upload ───── */
+.pd-upload-fieldset {
+  border: 2px dashed var(--color-border);
+  border-radius: var(--pd-radius-sm);
+  padding: 0;
+  margin: 0;
+}
+
+.pd-upload-legend {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text-main);
+  padding: 0 8px;
+  margin-left: 12px;
+}
+
+.pd-upload {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  cursor: pointer;
+  transition: background var(--pd-transition);
+}
+
+.pd-upload:hover {
+  background: var(--bg-main);
+}
+
+.pd-upload__icon {
+  font-size: 40px;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  transition: color var(--pd-transition);
+}
+
+.pd-upload:hover .pd-upload__icon {
+  color: var(--color-primary);
+}
+
+.pd-upload__text {
+  font-size: .875rem;
+  color: var(--text-main);
+  margin: 0 0 4px;
+}
+
+.pd-upload__hint {
+  font-size: .75rem;
+  color: var(--text-muted);
+}
+
+.pd-upload__input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/* ───── Buttons ───── */
+.pd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 24px;
+  font-size: .875rem;
+  font-weight: 600;
+  border: none;
+  border-radius: var(--pd-radius-sm);
+  cursor: pointer;
+  transition: all var(--pd-transition);
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.pd-btn .material-icons {
+  font-size: 18px;
+}
+
+.pd-btn--primary {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.pd-btn--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+  box-shadow: var(--pd-shadow-md);
+}
+
+.pd-btn--primary:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+}
+
+.pd-btn--outline {
+  background: transparent;
+  color: var(--text-main);
+  border: 1.5px solid var(--color-border);
+}
+
+.pd-btn--outline:hover {
+  background: var(--bg-main);
+  border-color: var(--text-muted);
+}
+
+.pd-btn--confirm {
+  background: var(--color-primary);
+  color: var(--text-inverse);
+  width: 100%;
+  justify-content: center;
+  padding: 10px 16px;
+}
+
+.pd-btn--confirm:hover {
+  background: var(--color-primary-hover);
+  box-shadow: var(--pd-shadow-md);
+}
+
+/* ───── Form Actions ───── */
+.pd-divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 0;
+}
+
+/* ───── Sidebar ───── */
+.pd-sidebar {
+  background: var(--bg-card);
+  border-radius: var(--pd-radius);
+  box-shadow: var(--pd-shadow);
+  border: 1px solid var(--color-border);
+  padding: 24px;
+  position: sticky;
+  top: 20px;
+}
+
+.pd-sidebar__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.pd-sidebar__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+/* LIVE badge */
+.pd-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  padding: 4px 12px;
+  border-radius: 20px;
+  letter-spacing: .5px;
+}
+
+.pd-live-badge__dot {
+  width: 6px;
+  height: 6px;
+  background: var(--color-success);
+  border-radius: 50%;
+  animation: pd-pulse 2s infinite;
+}
+
+@keyframes pd-pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: .4;
+  }
+}
+
+/* ───── KPI Cards (sidebar) ───── */
+.pd-kpi-card {
+  border-radius: var(--pd-radius-sm);
+  padding: 18px;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.pd-kpi-card--hh {
+  background: var(--bg-card);
+  color: var(--text-inverse);
+  border: 1px solid rgba(255, 255, 255, .08);
+}
+
+.pd-kpi-card--hh .pd-kpi-card__label {
+  color: rgba(255, 255, 255, .7);
+}
+
+.pd-kpi-card--hh .pd-kpi-card__value {
+  color: var(--text-inverse);
+  font-size: 2rem;
+}
+
+.pd-kpi-card--hh .pd-kpi-card__link {
+  color: rgba(255, 255, 255, .5);
+}
+
+.pd-kpi-card--prod {
+  background: var(--bg-main);
+  border: 1px solid var(--color-border);
+}
+
+.pd-kpi-card--prod .pd-kpi-card__label {
+  color: var(--text-muted);
+}
+
+.pd-kpi-card--prod .pd-kpi-card__value {
+  color: var(--text-main);
+  font-size: 1.6rem;
+}
+
+.pd-kpi-card--prod .pd-kpi-card__value small {
+  font-size: .85rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.pd-kpi-card--prod .pd-kpi-card__link {
+  color: var(--text-muted);
+}
+
+.pd-kpi-card__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+
+.pd-kpi-card__label .material-icons {
+  font-size: 16px;
+}
+
+.pd-kpi-card__value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.pd-kpi-card__link {
+  font-size: .7rem;
+  font-weight: 500;
+}
+
+/* ───── Category Costs (sidebar) ───── */
+.pd-category-costs {
+  padding: 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--pd-radius-sm);
+  margin-bottom: 12px;
+}
+
+.pd-category-costs__title {
+  font-size: .7rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin: 0 0 14px;
+}
+
+.pd-category-cost-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.pd-category-cost-row__icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.pd-category-cost-row__icon .material-icons {
+  font-size: 16px;
+}
+
+.pd-category-cost-row__icon--mat {
+  background: var(--pd-mat-bg);
+  color: var(--pd-mat);
+}
+
+.pd-category-cost-row__icon--mano {
+  background: var(--pd-mano-bg);
+  color: var(--pd-mano);
+}
+
+.pd-category-cost-row__icon--equip {
+  background: var(--pd-equip-bg);
+  color: var(--pd-equip);
+}
+
+.pd-category-cost-row__icon--otros {
+  background: var(--pd-otros-bg);
+  color: var(--pd-otros);
+}
+
+.pd-category-cost-row__label {
+  flex: 1;
+  font-size: .85rem;
+  color: var(--text-main);
+}
+
+.pd-category-cost-row__amount {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.pd-category-cost-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  margin-top: 8px;
+  border-top: 1px solid var(--color-border);
+}
+
+.pd-category-cost-total span:first-child {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.pd-category-cost-total__amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--pd-mat);
+}
+
+/* ───── Recent Records (sidebar) ───── */
+.pd-recent {
+  margin-top: 16px;
+}
+
+.pd-recent__title {
+  font-size: .85rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pd-recent__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.pd-recent__item:last-child {
+  border-bottom: none;
+}
+
+.pd-recent__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 5px;
+  flex-shrink: 0;
+}
+
+.pd-recent__dot--success {
+  background: var(--color-success);
+}
+
+.pd-recent__dot--pending {
+  background: var(--color-warning);
+}
+
+.pd-recent__dot--observed {
+  background: var(--color-danger);
+}
+
+.pd-recent__info {
+  flex: 1;
+}
+
+.pd-recent__code {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--pd-mat);
+  display: block;
+}
+
+.pd-recent__date {
+  font-size: .75rem;
+  color: var(--text-muted);
+}
+
+.pd-recent__status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: .7rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+  white-space: nowrap;
+  align-self: center;
+}
+
+.pd-recent__status--validado {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+  border: 1px solid var(--color-success);
+}
+
+.pd-recent__status--pendiente {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+  border: 1px solid var(--color-warning);
+}
+
+.pd-recent__status--observado {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+  border: 1px solid var(--color-danger);
+}
+
+.pd-recent__empty {
+  text-align: center;
+  padding: 24px 0;
+  color: var(--text-muted);
+}
+
+.pd-recent__empty .material-icons {
+  font-size: 32px;
+  display: block;
+  margin-bottom: 6px;
+  opacity: .4;
+}
+
+.pd-recent__empty p {
+  margin: 0;
+  font-size: .85rem;
+}
+
+/* ───── Badges ───── */
+.pd-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .2px;
+}
+
+.pd-badge--success {
+  color: var(--color-success);
+  background: var(--color-success-bg);
+}
+
+.pd-badge--pending {
+  color: var(--color-warning);
+  background: var(--color-warning-bg);
+}
+
+.pd-badge--observed {
+  color: var(--color-danger);
+  background: var(--color-danger-bg);
+}
+
+.pd-badge--neutral {
+  color: var(--text-light);
+  background: var(--color-border-light);
+}
+
+/* ───── Utility ───── */
+.text-center {
+  text-align: center;
+}
+
+.text-end {
+  text-align: right;
+}
+
+/* ───── Responsive ───── */
+@media (max-width: 991px) {
+  .pd-sidebar {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .pd-card {
+    padding: 20px;
+  }
+
+  .pd-sidebar {
+    padding: 20px;
+  }
+
+  .pd-cost-cards {
+    flex-direction: column;
+  }
+
+  .pd-cost-card {
+    min-width: 100%;
+  }
+
+  .pd-cost-tabs {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+}

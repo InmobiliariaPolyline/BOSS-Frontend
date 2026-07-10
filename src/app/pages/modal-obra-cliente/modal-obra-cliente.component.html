@@ -1,0 +1,202 @@
+<div class="modal-root">
+    <!-- CABECERA DEL MODAL -->
+    <div class="modal-header d-flex justify-content-between align-items-center border-bottom-0 pb-0">
+        <div class="d-flex align-items-center gap-2">
+            <i class="bi bi-building text-primary fs-3"></i>
+            <h2 class="modal-title fs-4 fw-bold m-0">Crear nueva obra</h2>
+        </div>
+        <button type="button" class="btn-close" (click)="cerrar()" aria-label="Cerrar"></button>
+    </div>
+
+    <div class="modal-body pt-0">
+        <p class="text-muted small mb-4">Registra los datos generales de la obra y del cliente. El código se genera
+            automáticamente.</p>
+
+        <!-- SECCIÓN: DATOS DE LA OBRA -->
+        <form [formGroup]="$form()">
+            <section class="mb-4">
+                <h3 class="section-title mb-3">
+                    <i class="bi bi-file-earmark-text text-secondary fs-5"></i> Datos de la obra
+                </h3>
+
+                <!-- Nombre de la obra -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small mb-1">Nombre de la obra *</label>
+                    <input type="text" class="pd-input w-100" formControlName="nombreObra" appFiltroTexto
+                        placeholder="Ej. Residencial Las Magnolias">
+                </div>
+
+                <!-- Ubicación -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small mb-1">
+                        <i class="bi bi-geo-alt text-muted fs-6 align-middle me-1"></i> Ubicación *
+                    </label>
+                    <input type="text" class="pd-input w-100" formControlName="ubicacion" appFiltroTexto
+                        placeholder="Distrito, ciudad">
+                </div>
+
+                <!-- Presupuesto -->
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small mb-1">
+                        <i class="bi bi-credit-card text-muted fs-6 align-middle me-1"></i> Presupuesto
+                        asignado (S/.)
+                    </label>
+                    <input type="number" class="pd-input w-100" formControlName="presupuestoTotal" placeholder="0.00"
+                        appFiltroNumeros="decimal">
+                </div>
+
+                <!-- Fechas -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">
+                            <i class="bi bi-calendar-event text-muted fs-6 align-middle me-1"></i> Fecha de inicio
+                        </label>
+                        <input type="date" class="pd-input w-100" formControlName="fechaInicio" appFiltroFechas>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">
+                            <i class="bi bi-calendar-event text-muted fs-6 align-middle me-1"></i> Fecha fin
+                            estimada
+                        </label>
+                        <input type="date" class="pd-input w-100" formControlName="fechaFinEstimada" appFiltroFechas>
+                    </div>
+                    @if ($form().errors?.['dateRangeInvalid']) {
+                        <div class="col-12 mt-1">
+                            <span class="text-danger small">La fecha fin estimada debe ser posterior a la fecha de inicio.</span>
+                        </div>
+                    }
+                </div>
+            </section>
+        </form>
+
+        <!-- SECCIÓN: DATOS DEL CLIENTE -->
+        <section class="mb-4">
+            <h3 class="section-title mb-3">
+                <i class="bi bi-person text-secondary fs-5"></i> Datos del cliente
+            </h3>
+
+            <!-- Buscador de cliente y Botón nuevo cliente -->
+            <div class="row align-items-end g-3 mb-3">
+                @if (!mostrarCrearCliente()) {
+                <div class="col-12 col-md">
+                    <label class="form-label fw-semibold small mb-1">
+                        <i class="bi bi-search text-muted fs-6 align-middle me-1"></i> Buscar Cliente *
+                    </label>
+                    <div class="position-relative">
+                        <div class="input-group">
+                            <input type="text" class="form-control border-end-0" [formControl]="searchCliente"
+                                appFiltroTexto placeholder="Escriba para buscar cliente..."
+                                (focus)="showClienteDropdown.set(true)" (blur)="showClienteDropdown.set(false)"
+                                autocomplete="off">
+                            <span class="input-group-text bg-white border-start-0 text-muted px-3"
+                                style="border-color: #dee2e6;">
+                                <i class="bi bi-search fs-5"></i>
+                            </span>
+                        </div>
+
+                        @if (showClienteDropdown() && filteredClientes().length > 0) {
+                        <ul class="cliente-dropdown shadow-lg">
+                            @for (c of filteredClientes(); track c.idCliente) {
+                            <li>
+                                <a class="cliente-dropdown-item" href="javascript:void(0)"
+                                    (mousedown)="selectCliente(c)">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="fw-semibold">{{ c.nombreCompleto }}</span>
+                                        <span class="doc-badge">Doc: {{ c.rucDNI }}</span>
+                                    </div>
+                                </a>
+                            </li>
+                            }
+                        </ul>
+                        }
+                    </div>
+                </div>
+                }
+
+                <div class="col-12 col-md-auto">
+                    @if (!mostrarCrearCliente()) {
+                    <button type="button"
+                        class="btn btn-outline-primary btn-toggle-cliente fw-semibold d-flex align-items-center justify-content-center px-3 gap-2"
+                        (click)="activarCrearCliente()">
+                        <i class="bi bi-plus-lg fs-5"></i> Nuevo Cliente
+                    </button>
+                    } @else {
+                    <button type="button"
+                        class="btn btn-outline-danger btn-toggle-cliente fw-semibold d-flex align-items-center justify-content-center px-3 gap-2"
+                        (click)="cancelarCrearCliente()">
+                        <i class="bi bi-x-lg fs-5"></i> Seleccionar Existente
+                    </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Campos de cliente (ocultos por defecto) -->
+            @if (mostrarCrearCliente()) {
+            <form [formGroup]="$form2()">
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">Nombres / Contacto principal
+                            *</label>
+                        <input type="text" class="pd-input w-100" formControlName="nombreCompleto" appFiltroTexto
+                            placeholder="Nombres y apellidos">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">DNI / RUC *</label>
+                        <input type="text" class="pd-input w-100" formControlName="rucDNI" appFiltroNumeros="entero"
+                            placeholder="Documento de identidad">
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small mb-1">Razón social *</label>
+                    <input type="text" class="pd-input w-100" formControlName="razonSocial" appFiltroTexto
+                        placeholder="Empresa o persona natural">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold small mb-1">Dirección *</label>
+                    <input type="text" class="pd-input w-100" formControlName="direccion" appFiltroTexto
+                        placeholder="Dirección fiscal o de contacto">
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">Persona de contacto *</label>
+                        <input type="text" class="pd-input w-100" formControlName="nombreContacto" appFiltroTexto
+                            placeholder="Nombre del contacto">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small mb-1">Teléfono *</label>
+                        <div class="d-flex gap-2">
+                            <div class="pd-input-select-wrapper" style="width: 120px; position: relative;">
+                                <select class="pd-input pd-select" [(ngModel)]="codigoPais" [ngModelOptions]="{standalone: true}">
+                                    @for (p of paises; track p.codigo) {
+                                        <option [value]="p.codigo">{{ p.codigo }}</option>
+                                    }
+                                </select>
+                                <i class="bi bi-chevron-down pd-select-arrow"></i>
+                            </div>
+                            <input type="text" class="pd-input w-100" formControlName="telefono" appFiltroNumeros="entero"
+                                placeholder="987 654 321" maxlength="15">
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="form-label fw-semibold small mb-1">Email *</label>
+                    <input type="email" class="pd-input w-100" formControlName="email" appFiltroTexto
+                        placeholder="cliente@gmail.com">
+                </div>
+            </form>
+            }
+        </section>
+    </div>
+
+    <!-- BOTONERA DE ACCIÓN -->
+    <div class="modal-footer border-top-0 pt-0 pb-4 px-4 d-flex justify-content-end gap-2">
+        <button type="button" class="btn btn-light border fw-semibold px-4 py-2" (click)="cerrar()">Cancelar</button>
+        <button type="button" class="btn btn-primary fw-semibold px-4 py-2"
+            [disabled]="mostrarCrearCliente() ? ($form().invalid || $form2().invalid) : ($form().invalid || !selectedCliente())"
+            (click)="registrar()">Crear obra</button>
+    </div>
+</div>

@@ -1,0 +1,173 @@
+<div class="pd-page container-fluid py-4">
+  <header class="page-header">
+    <div>
+      <h1 class="page-title">Donaciones</h1>
+      <p class="page-subtitle">Registro de aportes en efectivo y en especie</p>
+    </div>
+  </header>
+
+  <div class="row g-4">
+    <!-- Formulario Section -->
+    <section class="col-12 col-lg-5 col-xl-4">
+      <div class="pd-card">
+        <h5 class="pd-card__title mb-3">Nueva donación</h5>
+
+        <!-- Bootstrap Nav Tabs -->
+        <ul class="nav nav-tabs mb-3" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link fw-semibold" [class.active]="activeTab() === 'efectivo'"
+              (click)="activeTab.set('efectivo')" type="button">Efectivo</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link fw-semibold" [class.active]="activeTab() === 'especie'"
+              (click)="activeTab.set('especie')" type="button">Especie</button>
+          </li>
+        </ul>
+
+        @if (activeTab() === 'efectivo') {
+        <form [formGroup]="$formEfectivo()" (ngSubmit)="RegistrarEfectivo()" class="d-flex flex-column gap-3">
+          <div>
+            <label class="pd-label">Donante</label>
+            <input type="text" class="pd-input" formControlName="nombreDonante" appFiltroTexto placeholder="Nombre o empresa" required>
+          </div>
+
+          <div>
+            <label class="pd-label">Descripción</label>
+            <input type="text" class="pd-input" formControlName="descripcion" appFiltroTexto placeholder="Motivo o concepto" required>
+          </div>
+
+          <div>
+            <label class="pd-label">Monto total (S/.)</label>
+            <input type="number" class="pd-input" formControlName="montoTotal" placeholder="0.00" required appFiltroNumeros="decimal">
+            <span class="pd-hint">Valor total de la donación</span>
+          </div>
+
+          <button class="pd-btn pd-btn--confirm mt-2" [disabled]="$formEfectivo().invalid" type="submit">
+            <i class="bi bi-save"></i> Guardar Efectivo
+          </button>
+        </form>
+        } @else {
+        <form [formGroup]="$formEspecie()" (ngSubmit)="RegistrarEspecie()" class="d-flex flex-column gap-3">
+          <div>
+            <label class="pd-label">Donante</label>
+            <input type="text" class="pd-input" formControlName="nombreDonante" appFiltroTexto placeholder="Nombre o empresa" required>
+          </div>
+
+          <div>
+            <label class="pd-label">Material donado (Descripción)</label>
+            <input type="text" class="pd-input" formControlName="materialDonado" appFiltroTexto placeholder="Ej: Cemento, Ladrillos"
+              required>
+          </div>
+
+          <div>
+            <label class="pd-label">Stock (Cantidad)</label>
+            <input type="number" class="pd-input" formControlName="stock" placeholder="0" required appFiltroNumeros="entero">
+          </div>
+
+          <div>
+            <label class="pd-label">Unidad de medida</label>
+            <div class="pd-input-select-wrapper">
+              <select class="pd-input pd-select" formControlName="unidadMedida" required>
+                <option value="" disabled selected>Seleccione unidad</option>
+                <option value="Bolsas">Bolsas</option>
+                <option value="Unidades">Unidades</option>
+                <option value="M3">Metros Cúbicos (m³)</option>
+                <option value="M2">Metros Cuadrados (m²)</option>
+                <option value="Kg">Kilogramos</option>
+                <option value="Varillas">Varillas</option>
+                <option value="Galones">Galones</option>
+                <option value="Metros">Metros</option>
+                <option value="Planchas">Planchas</option>
+                <option value="Rollos">Rollos</option>
+                <option value="Viajes">Viajes</option>
+                <option value="Kits">Kits</option>
+                <option value="Global">Global</option>
+              </select>
+              <i class="bi bi-chevron-down pd-select-arrow"></i>
+            </div>
+          </div>
+
+          <button class="pd-btn pd-btn--confirm mt-2" [disabled]="$formEspecie().invalid" type="submit">
+            <i class="bi bi-save"></i> Guardar Especie
+          </button>
+        </form>
+        }
+      </div>
+    </section>
+
+    <!-- Resumen Section -->
+    <section class="col-12 col-lg-7 col-xl-8">
+      <div class="pd-card p-0">
+        <div class="pd-card__header p-4 pb-0 mb-4">
+          <i class="bi bi-heart text-danger fs-5"></i>
+          <h5 class="pd-card__title mb-0">Resumen</h5>
+        </div>
+        <div class="p-4 pt-0">
+
+          <!-- Stats Grid -->
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-sm-4">
+              <div class="pd-card p-3 h-100">
+                <span class="text-secondary small d-block mb-1">Total donaciones</span>
+                <span class="fs-4 fw-bold text-body mb-0">S/. {{ totalDonaciones() | number:'1.2-2' }}</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="pd-card p-3 h-100 bg-success bg-opacity-10 border-success border-opacity-25">
+                <span class="text-success small d-block mb-1">En efectivo</span>
+                <span class="fs-4 fw-bold text-success mb-0">S/. {{ totalEfectivo() | number:'1.2-2' }}</span>
+              </div>
+            </div>
+            <div class="col-12 col-sm-4">
+              <div class="pd-card p-3 h-100 bg-warning bg-opacity-10 border-warning border-opacity-25">
+                <span class="text-warning small d-block mb-1">En especie</span>
+                <span class="fs-4 fw-bold text-warning mb-0">{{ totalEspecie() }} donaciones</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="pd-table-container mt-4">
+            <table class="pd-table">
+              <thead>
+                <tr>
+                  <th>Código</th>
+                  <th>Donante</th>
+                  <th>Tipo</th>
+                  <th>Descripción</th>
+                  <th>Valor</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (d of $donaciones(); track d.idDonacion) {
+                <tr>
+                  <td>{{ d.idDonacion }}</td>
+                  <td>{{ d.nombreDonante }}</td>
+                  <td>
+                    <span class="pd-badge"
+                      [ngClass]="d.tipoDonacion?.toLowerCase() === 'efectivo' ? 'pd-badge--success' : 'pd-badge--pending'">
+                      {{ d.tipoDonacion }}
+                    </span>
+                  </td>
+                  <td>{{ d.descripcion }}</td>
+                  <td class="fw-semibold">S/. {{ d.montoTotal | number:'1.2-2' }}</td>
+                  <td class="text-secondary">{{ d.fechaRegistro | date:'dd/MM/yyyy' }}</td>
+                </tr>
+                } @empty {
+                <tr>
+                  <td colspan="6" class="text-center py-5">
+                    <div class="text-secondary fs-1 mb-3">
+                      <i class="bi bi-heartbreak"></i>
+                    </div>
+                    <h5 class="text-secondary">No se registraron donaciones</h5>
+                  </td>
+                </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>

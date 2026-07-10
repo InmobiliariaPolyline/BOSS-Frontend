@@ -1,0 +1,150 @@
+<div class="pd-card p-0 border-0">
+
+  <!-- HEADER -->
+  <div class="pd-card__header p-4 pb-3 mb-0 d-flex align-items-center justify-content-between border-bottom border-secondary">
+    <div class="d-flex align-items-center gap-2">
+      <i class="bi bi-person-plus text-primary fs-4"></i>
+      <div>
+        <h5 class="pd-card__title mb-0">{{estadoEdicion? 'Actualizar datos' : 'Registrar nuevo trabajador'}}</h5>
+        <small class="text-secondary">{{estadoEdicion? 'Modificar los datos del trabajador.' : 'Completa los datos personales, laborales y de contacto del trabajador.'}}</small>
+      </div>
+    </div>
+    <button type="button" class="btn-close btn-close-white" aria-label="Close" (click)="cancelar()"></button>
+  </div>
+
+  <div class="p-4">
+
+    <!-- DATOS PERSONALES -->
+    <div class="d-flex align-items-center gap-2 mb-3 text-primary fw-semibold">
+      <i class="bi bi-person"></i>
+      <span>Datos personales</span>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label class="pd-label">Nombres *</label>
+        <input type="text" class="pd-input" [(ngModel)]="empleado.nombres" placeholder="Ej. Juan Carlos" required appFiltroTexto />
+      </div>
+
+      <div class="col-md-6">
+        <label class="pd-label">Apellidos *</label>
+        <input type="text" class="pd-input" [(ngModel)]="empleado.apellidos" placeholder="Ej. Quispe Mamani" required appFiltroTexto />
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label class="pd-label">DNI *</label>
+        <input type="text" class="pd-input"
+          [(ngModel)]="empleado.dni"
+          placeholder="12345678"
+          maxlength="8"
+          appFiltroNumeros="entero"
+          required
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label class="pd-label">Estado</label>
+        <div class="pd-input-select-wrapper">
+          <select class="pd-input pd-select" [(ngModel)]="empleado.estado">
+            <option [ngValue]="true">Activo</option>
+            <option [ngValue]="false">Inactivo</option>
+          </select>
+          <i class="bi bi-chevron-down pd-select-arrow"></i>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4 border-secondary">
+
+    <!-- DATOS LABORALES -->
+    <div class="d-flex align-items-center gap-2 mb-3 text-primary fw-semibold">
+      <i class="bi bi-briefcase"></i>
+      <span>Datos laborales</span>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-12">
+        <label class="pd-label">Cargo</label>
+        <div class="pd-input-select-wrapper">
+          <select class="pd-input pd-select" [(ngModel)]="empleado.cargo">
+            <option value="" disabled selected>Seleccione un cargo</option>
+            @for (c of cargos; track c) {
+              <option [value]="c">{{ c }}</option>
+            }
+          </select>
+          <i class="bi bi-chevron-down pd-select-arrow"></i>
+        </div>
+      </div>
+    </div>
+
+    <hr class="my-4 border-secondary">
+
+    <!-- CONTACTO -->
+    <div class="d-flex align-items-center gap-2 mb-3 text-primary fw-semibold">
+      <i class="bi bi-telephone"></i>
+      <span>Contacto</span>
+    </div>
+
+    <!-- TELÉFONO CON CÓDIGO DE PAÍS -->
+    <div class="mb-3">
+      <label class="pd-label">Teléfono</label>
+      <div class="d-flex gap-2">
+        <div class="pd-input-select-wrapper" style="width: 120px;">
+          <select class="pd-input pd-select" [(ngModel)]="codigoPais">
+            @for (p of paises; track p.codigo) {
+              <option [value]="p.codigo">{{ p.codigo }}</option>
+            }
+          </select>
+          <i class="bi bi-chevron-down pd-select-arrow"></i>
+        </div>
+        <input type="text" class="pd-input"
+          [(ngModel)]="telefonoNumero"
+          placeholder="987 654 321"
+          maxlength="15"
+          appFiltroNumeros="entero"
+          required
+        />
+      </div>
+    </div>
+
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label class="pd-label">Email</label>
+        <input type="email" class="pd-input" 
+          [(ngModel)]="empleado.correoElectronico" 
+          placeholder="ejemplo@correo.com"
+          appFiltroTexto 
+        />
+      </div>
+
+      <div class="col-md-6">
+        <label class="pd-label">Dirección</label>
+        <input type="text" class="pd-input" 
+          [(ngModel)]="empleado.direccion" 
+          placeholder="Ej. Av. Siempre Viva 123" 
+          appFiltroTexto
+        />
+      </div>
+    </div>
+
+    <div class="mb-3">
+      <label class="pd-label">Observaciones</label>
+      <textarea class="pd-input" [(ngModel)]="empleado.observaciones"
+        placeholder="Notas adicionales sobre el trabajador"
+        rows="2">
+      </textarea>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="p-4 pt-0 d-flex justify-content-end gap-2 border-top-0">
+    <button type="button" class="pd-btn pd-btn--outline" (click)="cancelar()">Cancelar</button>
+    <button type="button" class="pd-btn pd-btn--confirm d-flex align-items-center gap-1" (click)="registrar()">
+      <i class="bi" [ngClass]="estadoEdicion ? 'bi-save' : 'bi-person-plus'"></i>
+      {{estadoEdicion? 'Guardar cambios' : 'Registrar trabajador'}}
+    </button>
+  </div>
+</div>

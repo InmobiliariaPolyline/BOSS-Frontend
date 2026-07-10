@@ -1,0 +1,4 @@
+/* Estilos específicos del directorio de trabajadores */
+.search-field input::placeholder {
+  font-size: 0.9rem;
+}

@@ -1,0 +1,193 @@
+.modal-root {
+	width: 100%;
+	max-width: 760px;
+	margin: 0 auto;
+	display: flex;
+	flex-direction: column;
+	background-color: var(--bg-card);
+	border-radius: 12px;
+	overflow: hidden;
+	font-family: 'Inter', Roboto, Arial, sans-serif;
+}
+
+.modal-header {
+	padding: 24px 24px 12px 24px;
+}
+
+.modal-title {
+	font-size: 20px;
+	font-weight: 700;
+	color: var(--text-main);
+}
+
+.modal-body {
+	padding: 0 24px 20px 24px;
+	max-height: 65vh;
+	overflow-y: auto;
+}
+
+.section-title {
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--text-main);
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.form-label {
+	color: var(--text-muted) !important;
+	font-size: 13px;
+	font-weight: 600;
+	margin-bottom: 6px;
+}
+
+/* Premium Inputs */
+.form-control {
+	height: 44px;
+	border: 1.5px solid #cbd5e1;
+	border-radius: 10px;
+	background-color: var(--bg-main);
+	font-size: 14px;
+	color: var(--text-main);
+	padding: 0 16px;
+	transition: all 0.2s ease;
+}
+
+.form-control::placeholder {
+	color: var(--text-light);
+}
+
+.form-control:focus {
+	background-color: var(--bg-card);
+	border-color: #1b2a4a;
+	box-shadow: 0 0 0 3px rgba(27, 42, 74, 0.1);
+}
+
+.form-control[readonly] {
+	background-color: var(--bg-main);
+	border-color: var(--color-border);
+	color: var(--text-muted);
+	cursor: not-allowed;
+}
+
+/* Buscador de clientes autocompletable */
+.cliente-selector-container {
+	width: 100%;
+}
+
+.cliente-dropdown {
+	position: absolute;
+	bottom: 100%;
+	left: 0;
+	width: 100%;
+	max-height: 220px;
+	overflow-y: auto;
+	z-index: 1050;
+	background-color: var(--bg-card);
+	border: 1px solid #e2e8f0;
+	border-radius: 10px;
+	list-style: none;
+	padding: 6px 0;
+	margin: 0 0 6px 0;
+	box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1), 0 -2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.cliente-dropdown-item {
+	display: block;
+	width: 100%;
+	padding: 10px 16px;
+	text-decoration: none;
+	color: var(--text-main);
+	font-size: 14px;
+	cursor: pointer;
+	box-sizing: border-box;
+}
+
+.cliente-dropdown-item:hover {
+	background-color: var(--bg-main);
+	color: var(--text-main);
+}
+
+.doc-badge {
+	background-color: #e2e8f0;
+	color: #1e293b;
+	font-size: 11px;
+	font-weight: 600;
+	padding: 3px 8px;
+	border-radius: 6px;
+}
+
+.btn-toggle-cliente {
+	height: 44px;
+	border-radius: 10px;
+	font-size: 14px;
+}
+
+/* Input group icons */
+.input-group .form-control {
+	border-top-right-radius: 0 !important;
+	border-bottom-right-radius: 0 !important;
+}
+
+.input-group-text {
+	border: 1.5px solid #cbd5e1;
+	border-left: none;
+	border-top-right-radius: 10px !important;
+	border-bottom-right-radius: 10px !important;
+}
+
+/* Date input adjustment */
+input[type="date"]::-webkit-calendar-picker-indicator {
+	cursor: pointer;
+	filter: invert(0.3);
+}
+
+/* Dialog footer buttons */
+.btn-create, .btn-primary {
+	background-color: #1b2a4a;
+	border-color: #1b2a4a;
+	color: var(--text-inverse);
+}
+
+.btn-primary:hover:not(:disabled) {
+	background-color: #0f1d36;
+	border-color: #0f1d36;
+}
+
+.btn-primary:disabled {
+	opacity: 0.65;
+	cursor: not-allowed;
+}
+
+.modal-footer {
+	padding: 12px 24px 24px 24px;
+}
+
+.modal-footer .btn {
+	border-radius: 10px;
+	font-size: 14px;
+}
+
+/* Animación / transiciones deshabilitadas para aparición instantánea */
+:host ::ng-deep .cdk-overlay-backdrop,
+:host ::ng-deep .cdk-overlay-pane {
+	transition: none !important;
+	animation: none !important;
+}
+
+.modal-root,
+.modal-root * {
+	transition: none !important;
+	animation: none !important;
+}
+
+@media (max-width: 768px) {
+	.modal-root {
+		width: 95vw;
+	}
+	.modal-body {
+		max-height: 80vh;
+	}
+}
+

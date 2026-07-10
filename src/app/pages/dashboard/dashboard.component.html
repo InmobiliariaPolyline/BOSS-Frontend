@@ -1,0 +1,406 @@
+<div class="pd-page container-fluid py-4">
+    <!-- Cabecera del Dashboard -->
+    <header class="page-header mb-4">
+        <h1 class="page-title">Dashboard Ejecutivo</h1>
+    </header>
+
+    <!-- KPI Principal: Presupuesto y Gastos -->
+    @if (mainKpi(); as mk) {
+    <div class="mb-4">
+        <div class="pd-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded d-flex align-items-center justify-content-center bg-primary bg-opacity-10 text-primary"
+                        style="width: 56px; height: 56px;">
+                        <i class="bi bi-wallet2 fs-3"></i>
+                    </div>
+                    <div>
+                        <h2 class="pd-card__title mb-1">{{ mk.title }}</h2>
+                        <span class="pd-badge pd-badge--success">{{ mk.percentage }}% Ejecutado</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <span class="text-secondary small d-block mb-1">Recursos Totales Disponibles</span>
+                    <strong class="fs-4 text-body d-block">{{ mk.presupuestoTotal }}</strong>
+                    @if (mk.hasDonaciones) {
+                    <div class="text-secondary small mt-2">
+                        <span>Base: <strong>{{ mk.presupuestoBaseStr }}</strong></span>
+                        <span class="mx-2">|</span>
+                        <span>Donaciones: <strong>{{ mk.donacionesStr }}</strong></span>
+                    </div>
+                    }
+                </div>
+                <div class="col-md-2 d-flex justify-content-center align-items-center">
+                    <div class="border-start h-100 border-secondary"></div>
+                </div>
+                <div class="col-md-5">
+                    <span class="text-secondary small d-block mb-1">Total Gastado</span>
+                    <strong class="fs-4 text-body d-block">{{ mk.gastado }}</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Rejilla de Tarjetas KPI -->
+    <div class="row row-cols-1 row-cols-md-2 g-3 mb-4">
+        @for (kpi of kpis(); track kpi.title) {
+        <div class="col">
+            <div class="pd-card h-100 d-flex align-items-center justify-content-between p-4">
+                <div>
+                    <span class="text-secondary small d-block mb-1">{{ kpi.title }}</span>
+                    <strong class="fs-4 text-body d-block mb-1">{{ kpi.value }}</strong>
+                    <span class="text-secondary small">{{ kpi.subtitle }}</span>
+                </div>
+                <div class="rounded d-flex align-items-center justify-content-center text-white"
+                    [style.background-color]="kpi.iconBg" style="width: 56px; height: 56px;">
+                    <i class="bi" [ngClass]="'bi-' + kpi.icon" style="font-size: 1.5rem;"></i>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+
+    <!-- Detalle Principal (Gráfico y Semáforos) -->
+    <div class="row g-4 mb-4">
+        <!-- Panel del Gráfico Lineal -->
+        <div class="col-xl-8">
+            <div class="pd-card h-100 p-0">
+                <div class="pd-card__header p-4 pb-0 d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <h2 class="pd-card__title mb-0">Cronograma Valorizado vs. Ejecución Real</h2>
+                    <!-- Selector de escala (Mensual vs Semanal) -->
+                    <div class="d-flex gap-2">
+                        <button type="button" class="pd-btn rounded-pill px-3"
+                            [ngClass]="viewMode() === 'mensual' ? 'pd-btn--primary' : 'pd-btn--outline'"
+                            (click)="setViewMode('mensual')">
+                            Mensual
+                        </button>
+                        <button type="button" class="pd-btn rounded-pill px-3"
+                            [ngClass]="viewMode() === 'semanal' ? 'pd-btn--primary' : 'pd-btn--outline'"
+                            (click)="setViewMode('semanal')">
+                            Semanal
+                        </button>
+                    </div>
+                </div>
+
+                <div class="p-4 pt-4">
+                    @if (hasChartData()) {
+                    <!-- Gráfica SVG -->
+                    <svg class="line-chart-svg" viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet">
+                        <defs>
+                            <!-- Degradado para área Valorizada -->
+                            <linearGradient id="grad-valorizado" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#2563eb" stop-opacity="0.16" />
+                                <stop offset="100%" stop-color="#2563eb" stop-opacity="0.00" />
+                            </linearGradient>
+                            <!-- Degradado para área Real -->
+                            <linearGradient id="grad-real" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="0%" stop-color="#f97316" stop-opacity="0.16" />
+                                <stop offset="100%" stop-color="#f97316" stop-opacity="0.00" />
+                            </linearGradient>
+                        </defs>
+
+                        <!-- Líneas de Guía Horizontal (Grid) -->
+                        <g class="chart-grid">
+                            <line x1="90" y1="40" x2="770" y2="40" stroke="#f1f5f9" stroke-dasharray="3,3" />
+                            <text x="80" y="44" class="grid-label">{{ yAxisLabels()[0] }}</text>
+
+                            <line x1="90" y1="90" x2="770" y2="90" stroke="#f1f5f9" stroke-dasharray="3,3" />
+                            <text x="80" y="94" class="grid-label">{{ yAxisLabels()[1] }}</text>
+
+                            <line x1="90" y1="140" x2="770" y2="140" stroke="#f1f5f9" stroke-dasharray="3,3" />
+                            <text x="80" y="144" class="grid-label">{{ yAxisLabels()[2] }}</text>
+
+                            <line x1="90" y1="190" x2="770" y2="190" stroke="#f1f5f9" stroke-dasharray="3,3" />
+                            <text x="80" y="194" class="grid-label">{{ yAxisLabels()[3] }}</text>
+
+                            <line x1="90" y1="240" x2="770" y2="240" stroke="#f8fafc" />
+                            <text x="80" y="244" class="grid-label">{{ yAxisLabels()[4] }}</text>
+                        </g>
+
+                        @if (valorizadoAreaPath) {
+                        <path [attr.d]="valorizadoAreaPath" fill="url(#grad-valorizado)" />
+                        }
+
+                        <!-- Área de Real (Naranja) -->
+                        @if (realAreaPath) {
+                        <path [attr.d]="realAreaPath" fill="url(#grad-real)" />
+                        }
+
+                        <!-- Líneas de curvas -->
+                        <!-- Línea Valorizado (Azul) -->
+                        @if (valorizadoPath) {
+                        <path [attr.d]="valorizadoPath" fill="none" stroke="#1e3a8a" stroke-width="3"
+                            stroke-linecap="round" class="chart-line-valorizado" />
+                        }
+
+                        <!-- Línea Real (Naranja) -->
+                        @if (realPath) {
+                        <path [attr.d]="realPath" fill="none" stroke="#ea580c" stroke-width="3" stroke-linecap="round"
+                            class="chart-line-real" />
+                        }
+
+                        <!-- Eje X - Etiquetas de Meses -->
+                        <g class="chart-axis-x">
+                            @for (month of chartMonths(); track $index) {
+                            <text [attr.x]="90 + $index * ((760 - 90) / (chartMonths().length - 1 || 1))" y="265"
+                                class="axis-label">{{ month }}</text>
+                            }
+                        </g>
+
+                        <!-- Línea de Guía y Puntos de Hover interactivos -->
+                        @if (activeTooltip(); as tooltip) {
+                        <line [attr.x1]="tooltip.x" y1="40" [attr.x2]="tooltip.x" y2="240" stroke="#cbd5e1"
+                            stroke-width="1.5" stroke-dasharray="2,2" />
+                        <circle [attr.cx]="tooltip.x" [attr.cy]="tooltip.yVal" r="6" fill="#ffffff" stroke="#1e3a8a"
+                            stroke-width="2.5" />
+                        <circle [attr.cx]="tooltip.x" [attr.cy]="tooltip.yReal" r="6" fill="#ffffff" stroke="#ea580c"
+                            stroke-width="2.5" />
+                        }
+
+                        <!-- Puntos finales (Siempre visibles en el extremo derecho) -->
+                        <g class="chart-dots">
+                            @if (lastValorizadoPoint; as pt) {
+                            <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="5" fill="#1e3a8a" stroke="#ffffff"
+                                stroke-width="1.5" />
+                            }
+                            @if (lastRealPoint; as pt) {
+                            <circle [attr.cx]="pt.x" [attr.cy]="pt.y" r="5" fill="#ea580c" stroke="#ffffff"
+                                stroke-width="1.5" />
+                            }
+                        </g>
+
+                        <!-- Columnas Interactivas para Hover (Rectángulos transparentes) -->
+                        <g class="hover-columns">
+                            @for (label of chartMonths(); track $index) {
+                            <rect
+                                [attr.x]="(90 + $index * ((760 - 90) / (chartMonths().length - 1 || 1))) - ((760 - 90) / (chartMonths().length - 1 || 1)) / 2"
+                                y="40" [attr.width]="(760 - 90) / (chartMonths().length - 1 || 1)" height="200"
+                                fill="transparent" class="hover-column-rect" (mouseenter)="onHoverPoint($index)"
+                                (mouseleave)="onLeavePoint()" />
+                            }
+                        </g>
+
+                        <!-- Tooltip Flotante Vectorial SVG -->
+                        @if (activeTooltip(); as tooltip) {
+                        <g class="chart-tooltip-group"
+                            [attr.transform]="'translate(' + (tooltip.x + (tooltip.x > 540 ? -225 : 15)) + ', ' + (tooltip.y > 140 ? tooltip.y - 95 : tooltip.y + 15) + ')'">
+                            <rect x="0" y="0" width="210" height="74" rx="8" ry="8" fill="#ffffff" stroke="#e2e8f0"
+                                stroke-width="1" class="tooltip-box-shadow" />
+                            <text x="12" y="20" class="tooltip-title-text">{{ tooltip.title }}</text>
+                            <text x="12" y="42" class="tooltip-value-text tooltip-value-text--valorizado">Valorizado :
+                                {{
+                                tooltip.valorizado }}</text>
+                            <text x="12" y="60" class="tooltip-value-text tooltip-value-text--real">Real : {{
+                                tooltip.real
+                                }}</text>
+                        </g>
+                        }
+                    </svg>
+                    } @else {
+                    <div class="chart-empty-state">
+                        <i class="bi bi-bar-chart empty-icon text-secondary" style="font-size: 3rem;"></i>
+                        <h3 class="empty-title">Sin información del cronograma</h3>
+                        <p class="empty-message">
+                            Registra el presupuesto total de la obra y reporta costos en
+                            los Partes Diarios para graficar el avance.
+                        </p>
+                    </div>
+                    }
+                </div>
+
+                @if (hasChartData()) {
+                <!-- Leyendas del Gráfico -->
+                <div class="d-flex gap-4 mt-3 ms-4 text-secondary small">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle"
+                            style="width: 12px; height: 12px; background-color: #2563eb;"></span>
+                        <span>Valorizado</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="rounded-circle"
+                            style="width: 12px; height: 12px; background-color: #10b981;"></span>
+                        <span>Real</span>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Panel de Semáforos de Estado -->
+        <div class="col-xl-4">
+            <div class="pd-card h-100 p-0">
+                <div class="pd-card__header p-4 border-bottom border-secondary">
+                    <h2 class="pd-card__title mb-0">Semáforos de Estado</h2>
+                </div>
+
+                <div class="p-4">
+                    <h3 class="text-secondary small mb-3">Rendimiento de Partidas Diarias</h3>
+
+                    <ul class="list-unstyled mb-0 d-flex flex-column gap-3">
+                        @for (item of partidasDiarias(); track item.label) {
+                        <li class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex align-items-center gap-2 text-truncate">
+                                <span class="rounded-circle" style="width: 10px; height: 10px;"
+                                    [ngClass]="item.status === 'green' ? 'bg-success' : (item.status === 'yellow' ? 'bg-warning' : 'bg-danger')"></span>
+                                <span class="text-body text-truncate">{{ item.label }}</span>
+                            </div>
+                            <span class="fw-bold ms-3"
+                                [ngClass]="item.status === 'green' ? 'text-success' : (item.status === 'yellow' ? 'text-warning' : 'text-danger')">
+                                {{ item.value }}
+                            </span>
+                        </li>
+                        } @empty {
+                        <li class="text-center text-secondary py-3">
+                            <span>No hay partidas registradas aún.</span>
+                        </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección de Historial de Partes -->
+    <div class="mb-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="h4 text-body fw-bold mb-0">Historial de Partes Diarios</h2>
+            <button class="pd-btn pd-btn--outline" (click)="showHistory.set(!showHistory())">
+                <i class="bi" [ngClass]="showHistory() ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                {{ showHistory() ? 'Ocultar Historial' : 'Ver Historial' }}
+            </button>
+        </div>
+
+        @if (showHistory()) {
+        <div>
+            @for (parte of historialPartesOrdenado(); track parte.idParteDiario) {
+            <div class="pd-card p-0 mb-3 history-card">
+                <div
+                    class="pd-card__header p-4 pb-3 mb-0 d-flex justify-content-between align-items-center border-bottom border-secondary">
+                    <div class="history-card-info">
+                        <span class="text-secondary small d-block mb-1">{{ parte.fechaInforme | date:'longDate'
+                            }}</span>
+                        <h3 class="pd-card__title mb-1">{{ parte.nombreParte }}</h3>
+                        <span class="text-secondary small"><i class="bi bi-person"></i> {{ parte.elaboradoPor }}</span>
+                    </div>
+                </div>
+
+                <div class="p-4">
+                    @if (parte.observaciones) {
+                    <div class="mb-4 text-secondary border-start border-3 border-primary ps-3">
+                        <i class="bi bi-card-text me-2"></i>
+                        <p class="mb-0 d-inline">{{ parte.observaciones }}</p>
+                    </div>
+                    }
+
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-6">
+                            <span class="fw-bold d-block mb-3 text-body">Avance Físico</span>
+                            <div>
+                                <div class="d-flex flex-column gap-2 mb-3 text-secondary small">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Ejecutado:</span>
+                                        <strong class="text-body">{{ parte.cantidadEjecutada }} {{ parte.unidadMedida
+                                            }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Rend. Real:</span>
+                                        <strong class="text-body">{{ parte.rendimientoReal }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between">
+                                        <span>Rend. Esperado:</span>
+                                        <strong class="text-body">{{ parte.rendimientoEsperado }}</strong>
+                                    </div>
+                                </div>
+                                <div class="progress bg-secondary" style="height: 6px;">
+                                    <div class="progress-bar bg-primary" role="progressbar"
+                                        [style.width.%]="parte.rendimientoEsperado > 0 ? (parte.cantidadEjecutada / parte.rendimientoEsperado * 100) : 100">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        @if (obtenerDesgloseCostos(parte); as desglose) {
+                        <div class="col-md-6">
+                            <span class="fw-bold d-block mb-3 text-body">Desglose de Gastos</span>
+                            <div class="pd-table-container">
+                                <table class="pd-table mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <td>Materiales</td>
+                                            <td class="text-end fw-bold">S/. {{ desglose.material | number:'1.2-2' }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Equipos</td>
+                                            <td class="text-end fw-bold">S/. {{ desglose.equipo | number:'1.2-2' }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Mano de Obra</td>
+                                            <td class="text-end fw-bold">S/. {{ desglose.manoObra | number:'1.2-2' }}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>Subcontratos</td>
+                                            <td class="text-end fw-bold">S/. {{ desglose.subcontrato | number:'1.2-2' }}
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="text-success fw-bold border-top border-secondary pt-2">GASTO
+                                                TOTAL</td>
+                                            <td class="text-success text-end fw-bold border-top border-secondary pt-2">
+                                                S/. {{ desglose.total | number:'1.2-2' }}</td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                        }
+                    </div>
+
+                    @if (parte.fotos && parte.fotos.length > 0) {
+                    <div class="mt-4 border-top border-secondary pt-4">
+                        <h4 class="h6 fw-bold mb-3 text-body">Evidencia Fotográfica</h4>
+                        <div class="d-flex overflow-auto gap-3 pb-2" style="scrollbar-width: thin;">
+                            @for (foto of parte.fotos; track foto.idFoto) {
+                            <img [src]="foto.urlCloud" alt="Evidencia" class="rounded cursor-pointer"
+                                style="height: 120px; width: 160px; object-fit: cover; border: 1px solid var(--pd-border);"
+                                (click)="selectedImageUrl.set(foto.urlCloud)">
+                            }
+                        </div>
+                    </div>
+                    } @else {
+                    <div class="text-center py-4 text-secondary border-top border-secondary mt-4">
+                        <i class="bi bi-image fs-1 d-block mb-2"></i>
+                        <span>Sin evidencia fotográfica</span>
+                    </div>
+                    }
+                </div>
+            </div>
+            } @empty {
+            <div class="text-center py-5 text-secondary pd-card">
+                <i class="bi bi-clock-history fs-1 d-block mb-3"></i>
+                <p>No hay partes diarios para mostrar por el momento.</p>
+            </div>
+            }
+        </div>
+        }
+    </div>
+
+    <!-- Visor de Imágenes a Pantalla Completa -->
+    @if (selectedImageUrl()) {
+    <div class="lightbox-overlay d-flex align-items-center justify-content-center position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75"
+        style="z-index: 1050;" (click)="selectedImageUrl.set(null)">
+        <button class="pd-btn pd-btn--outline text-white border-0 position-absolute top-0 end-0 m-3"
+            (click)="selectedImageUrl.set(null)">
+            <i class="bi bi-x-lg fs-3"></i>
+        </button>
+        <img [src]="selectedImageUrl()" class="lightbox-image" (click)="$event.stopPropagation()">
+    </div>
+    }
+</div>

@@ -1,0 +1,81 @@
+<div class="login-container">
+  <div class="brand-panel">
+    <div class="brand-header">
+      <div class="logo-box">
+        <i class="bi bi-tools logo-icon fs-3"></i>
+      </div>
+      <div class="brand-title">
+        <h1>BOSS</h1>
+        <p>by Polyline SAC</p>
+      </div>
+    </div>
+
+    <div class="brand-main-content">
+      <p class="tagline">Plataforma de Gestión de Construcción</p>
+      <h2>Construye con<br>control total<br>de tu obra.</h2>
+      <p class="description">
+        Centraliza presupuestos, partes diarios, inventario y reportes en una sola plataforma diseñada para residentes y
+        supervisores de campo.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <i class="bi bi-bar-chart fs-4 text-white"></i>
+          <p>KPIs en vivo</p>
+        </div>
+        <div class="feature-card">
+          <i class="bi bi-shield-lock fs-4 text-white"></i>
+          <p>Datos cifrados</p>
+        </div>
+        <div class="feature-card">
+          <i class="bi bi-people fs-4 text-white"></i>
+          <p>Multi-rol</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="brand-footer">
+      © 2026 Polyline SAC - Lima, Perú
+    </div>
+  </div>
+
+  <div class="form-panel">
+    <div class="form-container">
+      <h3>Bienvenido de vuelta</h3>
+      <p class="subtitle">Ingresa tus credenciales para acceder al panel.</p>
+
+      <form (ngSubmit)="onLogin()" #loginForm="ngForm">
+
+        <div class="login-field">
+          <label>Correo corporativo</label>
+          <div class="input-wrapper">
+            <i class="bi bi-envelope text-secondary me-2"></i>
+            <input type="text" name="username" [(ngModel)]="username" placeholder="usuario" required autocomplete="off">
+          </div>
+        </div>
+
+        <div class="login-field password-group">
+          <div class="label-row">
+            <label>Contraseña</label>
+          </div>
+          <div class="input-wrapper">
+            <i class="bi bi-lock text-secondary me-2"></i>
+            <input [type]="hidePassword ? 'password' : 'text'" name="password" [(ngModel)]="password"
+              placeholder="••••••••" required>
+            <i class="bi toggle-password cursor-pointer" [ngClass]="hidePassword ? 'bi-eye-slash' : 'bi-eye'" (click)="hidePassword = !hidePassword"></i>
+          </div>
+        </div>
+
+        @if (errorMessage()) {
+          <p class="error-msg">{{ errorMessage() }}</p>
+        }
+
+        <button type="submit" class="btn-submit" [disabled]="isLoggingIn()">
+          {{ isLoggingIn() ? 'Ingresando...' : 'Iniciar sesión' }}
+        </button>
+
+      </form>
+    </div>
+  </div>
+
+</div>

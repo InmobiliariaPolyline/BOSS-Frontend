@@ -1,0 +1,310 @@
+
+.dashboard-container {
+  padding: 24px;
+  background-color: var(--bg-main); 
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 24px; 
+}
+
+
+.bloques-superiores {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap; 
+  gap: 24px; 
+  width: 100%;
+}
+
+.caja-card {
+  flex: 2; 
+  min-width: 300px;
+}
+
+.movimiento-card {
+  flex: 1; 
+  min-width: 300px;
+}
+
+
+
+.caja-card {
+  background-color: var(--bg-card);
+  border-radius: 12px; 
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  padding: 16px;
+}
+
+mat-card-header {
+  margin-bottom: 16px;
+}
+
+mat-card-subtitle {
+  color: var(--text-muted) !important; 
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px !important;
+}
+
+.saldo-monto {
+  color: var(--color-primary); 
+  font-size: 32px; 
+  font-weight: bold;
+}
+
+mat-progress-bar {
+  height: 10px !important; 
+  border-radius: 5px;
+  margin-top: 15px;
+}
+
+::v-deep .mat-mdc-progress-bar .mdc-linear-progress__track {
+  background-color: var(--color-border) !important;
+}
+
+::v-deep .mat-mdc-progress-bar .mdc-linear-progress__bar-inner {
+  border-color: var(--color-primary) !important; 
+}
+
+.porcentaje-texto {
+  text-align: right;
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-top: 6px;
+  margin-bottom: 20px;
+}
+
+.resumen-container {
+  display: flex;
+  gap: 16px; 
+  width: 100%;
+  margin-top: 24px;
+}
+
+.bloque-ingreso, .bloque-egreso {
+  padding: 16px;
+  border-radius: 12px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.bloque-ingreso span, .bloque-egreso span {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.bloque-ingreso strong, .bloque-egreso strong {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.registro-count {
+  font-size: 11px;
+  font-weight: 500;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+
+.bloque-ingreso {
+  background-color: var(--color-success-bg); 
+}
+.bloque-ingreso span {
+  color: var(--color-success); 
+}
+.bloque-ingreso strong {
+  color: var(--color-success-text); 
+}
+
+.bloque-egreso {
+  background-color: var(--color-danger-bg); 
+}
+.bloque-egreso span {
+  color: var(--color-danger); 
+}
+.bloque-egreso strong {
+  color: var(--color-danger-text); 
+}
+
+.movimiento-card {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  padding: 16px;
+}
+
+.formulario-titulo {
+  color: var(--color-primary);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.formulario-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; 
+}
+
+.campo-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-main);
+}
+
+.campo-grupo mat-form-field {
+  width: 100%;
+}
+
+::v-deep .campo-grupo .mat-mdc-text-field-wrapper {
+  background-color: var(--color-border-light) !important; 
+  border-radius: 8px !important; 
+  border: 1px solid transparent;
+}
+
+::v-deep .campo-grupo .mdc-line-ripple {
+  display: none !important;
+}
+
+.btn-registrar {
+  background-color: var(--color-primary) !important; 
+  color: var(--text-inverse) !important;
+  border-radius: 8px !important;
+  padding: 24px !important; 
+  font-size: 15px !important;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.tabla-card {
+  background-color: var(--bg-card);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+  padding: 16px;
+  width: 100%;
+  margin-top: 24px; 
+  overflow-x: auto;
+}
+
+.tabla-titulo {
+  color: var(--color-primary);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 24px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.col-header {
+  color: var(--text-muted) !important; 
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--color-border-light) !important; 
+  padding: 12px 16px !important;
+}
+
+.col-celda {
+  padding: 16px !important;
+  font-size: 14px;
+  border-bottom: 1px solid var(--color-border-light) !important;
+}
+
+.cell-gris {
+  color: var(--text-muted);
+}
+
+.cell-oscuro {
+  color: var(--color-primary);
+}
+
+.font-medium { font-weight: 500; }
+.font-bold { font-weight: bold; }
+.text-right { text-align: right !important; }
+
+.chip-tipo {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.icono-punto {
+  font-size: 10px;
+}
+
+.chip-ingreso {
+  background-color: var(--color-success-bg);
+  color: var(--color-success-text);
+}
+
+.chip-egreso {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger-text);
+}
+
+.monto-ingreso {
+  color: var(--color-success-text); 
+}
+
+.monto-egreso {
+  color: var(--color-danger); 
+}
+
+/* Center table headers and cells for the Movimientos table */
+.tabla-card table th.mat-header-cell,
+.tabla-card table td.mat-cell {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* Make the amount column look centered but keep numeric formatting */
+.tabla-card table td.mat-cell.text-right, .tabla-card table td.text-right {
+  text-align: center !important;
+}
+
+/* Center only Monto and Fecha columns */
+.tabla-card table th.mat-header-cell.mat-column-monto,
+.tabla-card table td.mat-cell.mat-column-monto,
+.tabla-card table th.mat-header-cell.mat-column-fechaGasto,
+.tabla-card table td.mat-cell.mat-column-fechaGasto {
+  text-align: center !important;
+  vertical-align: middle !important;
+}
+
+/* Specific monto column styling */
+.tabla-card .monto-col {
+  text-align: center !important;
+  vertical-align: middle !important;
+  width: 180px;
+}
+
+.caja-creacion-card {
+  margin-bottom: 20px;
+}
+
+.formulario-caja {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.full-width {
+  width: 100%;
+}
