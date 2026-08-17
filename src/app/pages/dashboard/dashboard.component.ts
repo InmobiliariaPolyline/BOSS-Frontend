@@ -27,6 +27,7 @@ export interface SemaphoreItem {
 
 export interface DocumentoObra {
   idDocumento: string;
+  idObraArchivo?: number;
   nombre: string;
   tipo: 'DWG' | 'EXCEL' | 'DOCX';
   categoria: string;
@@ -120,11 +121,16 @@ export class DashboardComponent {
   readonly documentosObra = computed<DocumentoObra[]>(() => {
     const obra = this.obraService.$selectedObra();
     const backendArchivos = this.obraArchivoService.$listChange();
+    console.log('Documentos en signal listChange:', backendArchivos);
 
     if (obra && obra.idObra) {
-      const deObra = backendArchivos.filter(a => a.idObra === obra.idObra);
+      // Soportar tanto formato plano (idObra) como anidado (obra.idObra) por si acaso
+      const deObra = backendArchivos.filter(a => a.idObra == obra.idObra || (a as any).obra?.idObra == obra.idObra);
+      console.log('Documentos filtrados para la obra actual:', deObra);
+      
       return deObra.map(a => ({
-        idDocumento: `doc-${a.idObraArchivo}`,
+        idDocumento: `doc-${a.idObraArchivo || Math.random()}`,
+        idObraArchivo: a.idObraArchivo,
         nombre: a.nombreArchivo,
         tipo: (a.tipoArchivo?.toUpperCase() || 'DOCX') as 'DWG' | 'EXCEL' | 'DOCX',
         categoria: a.categoria || 'Documento de Obra',
@@ -172,7 +178,48 @@ export class DashboardComponent {
   onFileSelected(event: any): void {
     const fileList: FileList = event.target.files;
     if (fileList && fileList.length > 0) {
-      this.selectedFileToUpload.set(fileList[0]);
+      const file = fileList[0];
+      this.selectedFileToUpload.set(file);
+
+      // Auto-detectar tipo de archivo basado en la extensión
+      const fileName = file.name.toLowerCase();
+      if (fileName.endsWith('.dwg') || fileName.endsWith('.dxf')) {
+        this.uploadTipo.set('DWG');
+      } else if (fileName.endsWith('.xls') || fileName.endsWith('.xlsx') || fileName.endsWith('.csv')) {
+        this.uploadTipo.set('EXCEL');
+      } else if (fileName.endsWith('.doc') || fileName.endsWith('.docx') || fileName.endsWith('.pdf')) {
+        this.uploadTipo.set('DOCX');
+      }
+    }
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  abrirModalSubida(): void {
+    this.selectedFileToUpload.set(null);
+    this.uploadLinkTerabox.set('');
+    this.uploadTipo.set('DWG');
+    this.uploadProveedor.set('GOOGLE_DRIVE');
+    this.showUploadModal.set(true);
+  }
+
+  async eliminarArchivoObra(idObraArchivo: number): Promise<void> {
+    if (!confirm('¿Estás seguro de que deseas eliminar este archivo? Esta acción no se puede deshacer.')) {
+      return;
+    }
+
+    try {
+      await firstValueFrom(this.obraArchivoService.delete(idObraArchivo));
+      await this.cargarArchivosObra();
+    } catch (err) {
+      console.error('Error eliminando el archivo:', err);
+      alert('Hubo un error al eliminar el archivo.');
     }
   }
 
@@ -223,8 +270,9 @@ export class DashboardComponent {
       this.showUploadModal.set(false);
       this.selectedFileToUpload.set(null);
       this.uploadLinkTerabox.set('');
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error guardando archivo en backend:', err);
+      alert(err?.error?.message || 'Error en el servidor al procesar el archivo. Revisa los logs de Render o las credenciales de Google Drive.');
       await this.cargarArchivosObra();
       this.showUploadModal.set(false);
     } finally {
@@ -641,6 +689,7 @@ export class DashboardComponent {
   private async cargarArchivosObra(): Promise<void> {
     try {
       const data = await firstValueFrom(this.obraArchivoService.findAll());
+      console.log('Archivos recibidos del backend en cargarArchivosObra:', data);
       this.obraArchivoService.setListChange(data || []);
     } catch (err) {
       console.error('Error cargando archivos de obra desde backend:', err);

@@ -284,7 +284,7 @@
                         <i class="bi" [ngClass]="isSyncing() ? 'bi-arrow-repeat spin-anim' : 'bi-arrow-repeat'"></i>
                         {{ isSyncing() ? 'Sincronizando...' : 'Sincronizar Cloud' }}
                     </button>
-                    <button class="pd-btn pd-btn--primary" (click)="showUploadModal.set(true)">
+                    <button class="pd-btn pd-btn--primary" (click)="abrirModalSubida()">
                         <i class="bi bi-cloud-plus me-1"></i> Subir Archivo
                     </button>
                 </div>
@@ -297,9 +297,9 @@
                     <div class="pd-card p-4 h-100 border bg-body-tertiary d-flex flex-column justify-content-between">
                         <div>
                             <!-- Header de la tarjeta de archivo -->
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="rounded p-2 text-white d-flex align-items-center justify-content-center shadow-sm"
+                            <div class="d-flex justify-content-between align-items-start mb-3 w-100 overflow-hidden">
+                                <div class="d-flex align-items-center gap-3 w-100 overflow-hidden">
+                                    <div class="rounded p-2 text-white d-flex align-items-center justify-content-center shadow-sm flex-shrink-0"
                                         [ngClass]="{
                                             'bg-danger': doc.tipo === 'DWG',
                                             'bg-success': doc.tipo === 'EXCEL',
@@ -309,7 +309,7 @@
                                         @if (doc.tipo === 'EXCEL') { <i class="bi bi-file-earmark-excel fs-3"></i> }
                                         @if (doc.tipo === 'DOCX') { <i class="bi bi-file-earmark-word fs-3"></i> }
                                     </div>
-                                    <div class="overflow-hidden">
+                                    <div class="overflow-hidden flex-grow-1">
                                         <span class="badge text-bg-light border mb-1">{{ doc.categoria }}</span>
                                         <h3 class="h6 mb-0 text-truncate font-monospace text-body" [title]="doc.nombre">{{ doc.nombre }}</h3>
                                     </div>
@@ -350,7 +350,10 @@
                             <a [href]="doc.urlAcceso" target="_blank" rel="noopener" class="pd-btn pd-btn--outline btn-sm text-decoration-none" [title]="'Abrir en ' + (doc.proveedor === 'GOOGLE_DRIVE' ? 'Google Drive' : 'TeraBox')">
                                 <i class="bi" [ngClass]="doc.proveedor === 'GOOGLE_DRIVE' ? 'bi-google' : 'bi-cloud-fill'"></i>
                             </a>
-                            <button class="pd-btn pd-btn--outline btn-sm text-secondary" (click)="showUploadModal.set(true)" title="Subir nueva versión">
+                            <button class="pd-btn pd-btn--outline btn-sm text-danger" (click)="doc.idObraArchivo && eliminarArchivoObra(doc.idObraArchivo)" title="Eliminar archivo" [disabled]="!doc.idObraArchivo">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                            <button class="pd-btn pd-btn--outline btn-sm text-secondary" (click)="abrirModalSubida()" title="Subir nueva versión">
                                 <i class="bi bi-arrow-repeat"></i>
                             </button>
                         </div>
@@ -362,7 +365,7 @@
                         <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary"></i>
                         <h3 class="h6 fw-bold text-body mb-1">Sin archivos o planos subidos aún</h3>
                         <p class="small text-secondary mb-3">Esta obra no posee planos DWG, metrados Excel ni expedientes Word registrados.</p>
-                        <button class="pd-btn pd-btn--primary btn-sm" (click)="showUploadModal.set(true)">
+                        <button class="pd-btn pd-btn--primary btn-sm" (click)="abrirModalSubida()">
                             <i class="bi bi-cloud-plus me-1"></i> Subir el Primer Archivo
                         </button>
                     </div>
@@ -431,14 +434,7 @@
                 <h3 class="h5 mb-0 fw-bold text-body"><i class="bi bi-cloud-arrow-up me-2 text-primary"></i>Subir / Vincular Archivo</h3>
                 <button type="button" class="btn-close" (click)="showUploadModal.set(false)"></button>
             </div>
-            <div class="mb-3">
-                <label class="form-label small fw-bold">Tipo de Archivo</label>
-                <select class="form-select" [value]="uploadTipo()" (change)="uploadTipo.set($any($event.target).value)">
-                    <option value="DWG">Plano de Arquitectura / Estructuras (.dwg)</option>
-                    <option value="EXCEL">Presupuesto y Metrados (.xlsx)</option>
-                    <option value="DOCX">Expediente Técnico / Memoria (.docx)</option>
-                </select>
-            </div>
+
             <div class="mb-3">
                 <label class="form-label small fw-bold">Servicio de Almacenamiento Cloud</label>
                 <div class="d-flex gap-3">
@@ -470,8 +466,13 @@
                 <div class="border border-2 border-dashed rounded p-4 text-center bg-body-tertiary">
                     <i class="bi bi-file-earmark-arrow-up fs-1 text-secondary mb-2 d-block"></i>
                     @if (selectedFileToUpload()) {
-                        <span class="badge text-bg-primary fs-6 mb-1">{{ selectedFileToUpload()?.name }}</span>
-                        <span class="small text-secondary d-block">{{ (selectedFileToUpload()!.size / (1024 * 1024)).toFixed(2) }} MB</span>
+                        <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+                            <span class="badge text-bg-primary fs-6 text-truncate d-inline-block" style="max-width: 80%;">{{ selectedFileToUpload()?.name }}</span>
+                            <button type="button" class="btn btn-sm btn-outline-danger border-0 p-1" (click)="selectedFileToUpload.set(null)" title="Quitar selección">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                        <span class="small text-secondary d-block">{{ formatFileSize(selectedFileToUpload()!.size) }}</span>
                     } @else {
                         <span class="small text-secondary d-block mb-2">Arrastra tu archivo aquí o haz clic para examinar</span>
                         <input type="file" class="form-control form-control-sm" accept=".dwg,.xlsx,.xls,.docx,.doc" (change)="onFileSelected($event)">
