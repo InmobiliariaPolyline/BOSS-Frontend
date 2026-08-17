@@ -8,7 +8,6 @@ import { MaterialService } from '../../../../services/material.service';
 import { ObraService } from '../../../../services/obra.service';
 import { Material } from '../../../../model/material';
 import { FiltroTextoDirective } from '../../../../shared/directives/filtro-texto.directive';
-import { FiltroNumerosDirective } from '../../../../shared/directives/filtro-numeros.directive';
 import { FiltroFechasDirective } from '../../../../shared/directives/filtro-fechas.directive';
 import { firstValueFrom } from 'rxjs';
 
@@ -19,7 +18,6 @@ import { firstValueFrom } from 'rxjs';
     CommonModule,
     FormsModule,
     FiltroTextoDirective,
-    FiltroNumerosDirective,
     FiltroFechasDirective,
   ],
   templateUrl: './nuevo-material.component.html',

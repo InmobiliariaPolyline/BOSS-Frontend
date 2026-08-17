@@ -6,6 +6,8 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { firstValueFrom } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
+import { FormsModule } from '@angular/forms';
+
 import { Obra } from '../../model/obra';
 import { ObraService } from '../../services/obra.service';
 import { ModalObraClienteComponent } from '../modal-obra-cliente/modal-obra-cliente.component';
@@ -23,6 +25,7 @@ type NavigationItem = {
   standalone: true,
   imports: [
     CommonModule,
+    FormsModule,
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
@@ -44,6 +47,7 @@ export class LayoutComponent implements OnInit {
   readonly selectedObraId = signal<number | null>(null);
   readonly isDarkMode = signal(false);
   readonly currentUrl = signal(this.router.url);
+  readonly searchObra = signal<string>('');
 
   readonly navigationItems: NavigationItem[] = [
   { icon: 'grid-1x2', label: 'Dashboard', route: '/pages/dashboard' },
@@ -65,6 +69,18 @@ export class LayoutComponent implements OnInit {
   readonly obras = this.obraService.$listChange;
 
   readonly hasObras = computed(() => this.obras().length > 0);
+
+  readonly filteredObras = computed(() => {
+    const search = this.searchObra().toLowerCase().trim();
+    const list = this.obras();
+    if (!search) return list;
+    return list.filter((o) =>
+      (o.nombreObra || '').toLowerCase().includes(search) ||
+      (o.ubicacion || '').toLowerCase().includes(search) ||
+      (`obr-${o.idObra}`).toLowerCase().includes(search) ||
+      (`${o.idObra}`).includes(search)
+    );
+  });
 
   readonly selectedObra = computed(() => {
     const obras = this.obras();
@@ -152,8 +168,14 @@ export class LayoutComponent implements OnInit {
 
   toggleSidebar(): void { this.sidebarOpen.update(v => !v); }
   closeSidebar(): void { this.sidebarOpen.set(false); }
-  toggleObraPanel(): void { this.obraPanelOpen.update(v => !v); }
-  closeObraPanel(): void { this.obraPanelOpen.set(false); }
+  toggleObraPanel(): void {
+    this.obraPanelOpen.update(v => !v);
+    if (!this.obraPanelOpen()) this.searchObra.set('');
+  }
+  closeObraPanel(): void {
+    this.obraPanelOpen.set(false);
+    this.searchObra.set('');
+  }
 
   selectObra(obra: Obra): void {
     if (obra.idObra !== undefined) {

@@ -127,7 +127,10 @@ export class ModalObraClienteComponent implements OnInit {
     this.showClienteDropdown.set(false);
   }
 
+  protected errorMessage = signal<string>('');
+
   activarCrearCliente() {
+    this.errorMessage.set('');
     this.mostrarCrearCliente.set(true);
     this.selectedCliente.set(null);
     this.searchCliente.setValue('', { emitEvent: false });
@@ -135,11 +138,32 @@ export class ModalObraClienteComponent implements OnInit {
   }
 
   cancelarCrearCliente() {
+    this.errorMessage.set('');
     this.mostrarCrearCliente.set(false);
     this.$form2().reset();
   }
 
+  private parseErrorMsg(error: any, defaultMsg: string): string {
+    const rawMsg: string = (typeof error?.error === 'string' ? error.error : error?.error?.message) || '';
+    if (rawMsg.includes('rucdni') || rawMsg.includes('Key (rucdni)=')) {
+      const match = rawMsg.match(/Key \(rucdni\)=\(([^)]+)\)/);
+      const val = match ? ` "${match[1]}"` : '';
+      return `El número de DNI/RUC${val} ya se encuentra registrado para otro cliente en el sistema.`;
+    }
+    if (rawMsg.includes('email') && (rawMsg.includes('already exists') || rawMsg.includes('duplicate'))) {
+      return 'El correo electrónico ingresado ya pertenece a otro cliente registrado.';
+    }
+    if (rawMsg.includes('nombre_obra') || rawMsg.includes('nombreObra')) {
+      return 'Ya existe una obra registrada con ese nombre en la base de datos.';
+    }
+    if (rawMsg.includes('duplicate key') || rawMsg.includes('unique constraint')) {
+      return 'Ya existe un cliente u obra registrado con esos mismos datos únicos en la base de datos.';
+    }
+    return rawMsg || defaultMsg;
+  }
+
   async registrar(): Promise<void> {
+    this.errorMessage.set('');
     if (this.$form().valid) {
       const datosObra = this.$form().value;
 
@@ -153,8 +177,9 @@ export class ModalObraClienteComponent implements OnInit {
             const clienteCreado: any = await firstValueFrom(this.clienteService.save(datosCliente as any));
             datosObra.idCliente = clienteCreado.idCliente;
             await this.guardarObra(datosObra);
-          } catch (error) {
-            console.error(error);
+          } catch (error: any) {
+            console.error('Error al guardar cliente:', error);
+            this.errorMessage.set(this.parseErrorMsg(error, 'Error al guardar el cliente. Verifique si el RUC/DNI, email o razón social ya existen.'));
           }
         }
       } else {
@@ -170,8 +195,9 @@ export class ModalObraClienteComponent implements OnInit {
     try {
       await firstValueFrom(this.obraService.save(datosObra as any));
       this.activeModal.close(true);
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      console.error('Error al guardar obra:', error);
+      this.errorMessage.set(this.parseErrorMsg(error, 'No se pudo guardar la obra. Es posible que el nombre de la obra ya se encuentre registrado en la base de datos.'));
     }
   }
 

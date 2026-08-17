@@ -1,10 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { ObraService } from '../../services/obra.service';
 import { ParteDiarioService } from '../../services/parte-diario.service';
 import { CajaChicaService } from '../../services/caja-chica.service';
 import { GastoCajaService } from '../../services/gasto-caja.service';
 import { DonacionesService } from '../../services/donaciones.service';
+import { ObraArchivoService } from '../../services/obra-archivo.service';
 import { ParteDiario } from '../../model/parteDiario';
 import { firstValueFrom } from 'rxjs';
 
@@ -23,6 +25,20 @@ export interface SemaphoreItem {
   status: 'green' | 'yellow' | 'red';
 }
 
+export interface DocumentoObra {
+  idDocumento: string;
+  nombre: string;
+  tipo: 'DWG' | 'EXCEL' | 'DOCX';
+  categoria: string;
+  proveedor: 'GOOGLE_DRIVE' | 'TERABOX';
+  urlAcceso: string;
+  fileIdNube?: string;
+  tamano: string;
+  ultimaModificacion: string;
+  estadoSincronizacion: 'SINCRONIZADO' | 'PENDIENTE' | 'ERROR';
+  version: string;
+}
+
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -38,12 +54,183 @@ export class DashboardComponent {
   private readonly cajaChicaService = inject(CajaChicaService);
   private readonly gastoCajaService = inject(GastoCajaService);
   private readonly donacionesService = inject(DonacionesService);
+  private readonly obraArchivoService = inject(ObraArchivoService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   // 1. Filtro de vista y hover
   readonly viewMode = signal<'mensual' | 'semanal'>('mensual');
   readonly showHistory = signal(false);
   readonly hoveredIndex = signal<number | null>(null);
   readonly selectedImageUrl = signal<string | null>(null);
+
+  // Visor integrado de Planos y Documentos
+  readonly selectedDocPreview = signal<DocumentoObra | null>(null);
+  readonly previewSafeUrl = signal<SafeResourceUrl | null>(null);
+
+  // Formulario de Subida
+  readonly selectedFileToUpload = signal<File | null>(null);
+  readonly uploadTipo = signal<'DWG' | 'EXCEL' | 'DOCX'>('DWG');
+  readonly uploadProveedor = signal<'GOOGLE_DRIVE' | 'TERABOX'>('GOOGLE_DRIVE');
+  readonly uploadLinkTerabox = signal<string>('');
+  readonly isUploading = signal(false);
+
+  // Documentos de Obra (Sincronizados con backend Spring Boot + Drive / TeraBox)
+  readonly showUploadModal = signal(false);
+  readonly isSyncing = signal(false);
+
+  private readonly demoDocs: DocumentoObra[] = [
+    {
+      idDocumento: 'doc-001',
+      nombre: 'Plano_Estructuras_Sector_A.dwg',
+      tipo: 'DWG',
+      categoria: 'Plano de Obra',
+      proveedor: 'GOOGLE_DRIVE',
+      urlAcceso: 'https://drive.google.com',
+      tamano: '14.2 MB',
+      ultimaModificacion: 'Hoy, 09:30 AM',
+      estadoSincronizacion: 'SINCRONIZADO',
+      version: 'v2.1'
+    },
+    {
+      idDocumento: 'doc-002',
+      nombre: 'Cronograma_Valorizado_Metrados.xlsx',
+      tipo: 'EXCEL',
+      categoria: 'Presupuesto y Metrados',
+      proveedor: 'GOOGLE_DRIVE',
+      urlAcceso: 'https://drive.google.com',
+      tamano: '3.8 MB',
+      ultimaModificacion: 'Ayer, 05:15 PM',
+      estadoSincronizacion: 'SINCRONIZADO',
+      version: 'v1.4'
+    },
+    {
+      idDocumento: 'doc-003',
+      nombre: 'Memoria_Descriptiva_Especificaciones.docx',
+      tipo: 'DOCX',
+      categoria: 'Expediente Técnico',
+      proveedor: 'TERABOX',
+      urlAcceso: 'https://www.terabox.com',
+      tamano: '2.1 MB',
+      ultimaModificacion: 'Hace 3 días',
+      estadoSincronizacion: 'SINCRONIZADO',
+      version: 'v1.0'
+    }
+  ];
+
+  readonly documentosObra = computed<DocumentoObra[]>(() => {
+    const obra = this.obraService.$selectedObra();
+    const backendArchivos = this.obraArchivoService.$listChange();
+
+    if (obra && obra.idObra) {
+      const deObra = backendArchivos.filter(a => a.idObra === obra.idObra);
+      return deObra.map(a => ({
+        idDocumento: `doc-${a.idObraArchivo}`,
+        nombre: a.nombreArchivo,
+        tipo: (a.tipoArchivo?.toUpperCase() || 'DOCX') as 'DWG' | 'EXCEL' | 'DOCX',
+        categoria: a.categoria || 'Documento de Obra',
+        proveedor: (a.proveedorNube || 'GOOGLE_DRIVE') as 'GOOGLE_DRIVE' | 'TERABOX',
+        urlAcceso: a.urlAcceso || 'https://drive.google.com',
+        fileIdNube: a.fileIdNube,
+        tamano: a.tamano || '1.5 MB',
+        ultimaModificacion: 'Reciente',
+        estadoSincronizacion: (a.estadoSincronizacion || 'SINCRONIZADO') as 'SINCRONIZADO' | 'PENDIENTE' | 'ERROR',
+        version: a.version || 'v1.0'
+      }));
+    }
+    return [];
+  });
+
+  async sincronizarArchivos(): Promise<void> {
+    this.isSyncing.set(true);
+    await this.cargarArchivosObra();
+    setTimeout(() => {
+      this.isSyncing.set(false);
+    }, 1000);
+  }
+
+  abrirVisorDocumento(doc: DocumentoObra): void {
+    let embedUrl = doc.urlAcceso;
+
+    // Si es Google Drive, adaptar a visor iframe
+    if (doc.proveedor === 'GOOGLE_DRIVE') {
+      if (embedUrl.includes('/view')) {
+        embedUrl = embedUrl.replace('/view', '/preview');
+      } else if (!embedUrl.includes('/preview') && doc.fileIdNube) {
+        embedUrl = `https://drive.google.com/file/d/${doc.fileIdNube}/preview`;
+      }
+    }
+
+    this.selectedDocPreview.set(doc);
+    this.previewSafeUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(embedUrl));
+  }
+
+  cerrarVisor(): void {
+    this.selectedDocPreview.set(null);
+    this.previewSafeUrl.set(null);
+  }
+
+  onFileSelected(event: any): void {
+    const fileList: FileList = event.target.files;
+    if (fileList && fileList.length > 0) {
+      this.selectedFileToUpload.set(fileList[0]);
+    }
+  }
+
+  async guardarYVincularArchivo(): Promise<void> {
+    const obra = this.obraService.$selectedObra();
+    if (!obra || !obra.idObra) {
+      alert('Por favor selecciona una obra primero.');
+      return;
+    }
+
+    const file = this.selectedFileToUpload();
+    const proveedor = this.uploadProveedor();
+    const tipo = this.uploadTipo();
+    const url = proveedor === 'TERABOX' ? (this.uploadLinkTerabox() || 'https://www.terabox.com') : 'https://drive.google.com';
+
+    this.isUploading.set(true);
+
+    try {
+      if (file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('idObra', obra.idObra.toString());
+        formData.append('tipoArchivo', tipo);
+        formData.append('proveedorNube', proveedor);
+        formData.append('categoria', tipo === 'DWG' ? 'Plano de Obra' : (tipo === 'EXCEL' ? 'Presupuesto y Metrados' : 'Expediente Técnico'));
+        formData.append('urlAcceso', url);
+
+        await firstValueFrom(this.obraArchivoService.uploadFile(formData));
+      } else {
+        const nombre = tipo === 'DWG' ? 'Plano_Estructuras.dwg' : (tipo === 'EXCEL' ? 'Metrados_Presupuesto.xlsx' : 'Memoria_Descriptiva.docx');
+        const nuevoDto = {
+          idObra: obra.idObra,
+          nombreArchivo: nombre,
+          tipoArchivo: tipo,
+          fileIdNube: 'cloud-' + Date.now(),
+          proveedorNube: proveedor,
+          urlAcceso: url,
+          categoria: tipo === 'DWG' ? 'Plano de Obra' : (tipo === 'EXCEL' ? 'Presupuesto y Metrados' : 'Expediente Técnico'),
+          tamano: '2.5 MB',
+          version: 'v1.0',
+          estadoSincronizacion: 'SINCRONIZADO'
+        };
+
+        await firstValueFrom(this.obraArchivoService.save(nuevoDto as any));
+      }
+
+      await this.cargarArchivosObra();
+      this.showUploadModal.set(false);
+      this.selectedFileToUpload.set(null);
+      this.uploadLinkTerabox.set('');
+    } catch (err) {
+      console.error('Error guardando archivo en backend:', err);
+      await this.cargarArchivosObra();
+      this.showUploadModal.set(false);
+    } finally {
+      this.isUploading.set(false);
+    }
+  }
 
   // 2. Filtrar partes diarios de la obra seleccionada reactivamente
   readonly partesObraActiva = computed(() => {
@@ -446,8 +633,19 @@ export class DashboardComponent {
     await Promise.all([
       this.cargarPartesDiarios(),
       this.cargarCajaChicaYGastos(),
-      this.cargarDonaciones()
+      this.cargarDonaciones(),
+      this.cargarArchivosObra()
     ]);
+  }
+
+  private async cargarArchivosObra(): Promise<void> {
+    try {
+      const data = await firstValueFrom(this.obraArchivoService.findAll());
+      this.obraArchivoService.setListChange(data || []);
+    } catch (err) {
+      console.error('Error cargando archivos de obra desde backend:', err);
+      this.obraArchivoService.setListChange([]);
+    }
   }
 
   setViewMode(mode: 'mensual' | 'semanal'): void {

@@ -262,7 +262,232 @@
                 </div>
             </div>
         </div>
+    <!-- Sección de Sincronización de Archivos y Planos de la Obra (Drive & TeraBox) -->
+    <div class="mb-5">
+        <div class="pd-card p-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+                <div>
+                    <div class="d-flex align-items-center gap-2 mb-1">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-2 text-primary d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                            <i class="bi bi-cloud-arrow-up-fill fs-5"></i>
+                        </div>
+                        <h2 class="h4 text-body fw-bold mb-0">Documentación y Planos de Obra</h2>
+                    </div>
+                    <span class="text-secondary small ms-1">
+                        Sincronización centralizada de archivos con 
+                        <strong class="text-body"><i class="bi bi-google text-primary"></i> Google Drive</strong> y 
+                        <strong class="text-body"><i class="bi bi-cloud-fill text-warning"></i> TeraBox</strong>
+                    </span>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="pd-btn pd-btn--outline" (click)="sincronizarArchivos()" [disabled]="isSyncing()">
+                        <i class="bi" [ngClass]="isSyncing() ? 'bi-arrow-repeat spin-anim' : 'bi-arrow-repeat'"></i>
+                        {{ isSyncing() ? 'Sincronizando...' : 'Sincronizar Cloud' }}
+                    </button>
+                    <button class="pd-btn pd-btn--primary" (click)="showUploadModal.set(true)">
+                        <i class="bi bi-cloud-plus me-1"></i> Subir Archivo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Rejilla de Archivos Principales de la Obra (.DWG, .XLSX, .DOCX) -->
+            <div class="row g-4">
+                @for (doc of documentosObra(); track doc.idDocumento) {
+                <div class="col-lg-4 col-md-6">
+                    <div class="pd-card p-4 h-100 border bg-body-tertiary d-flex flex-column justify-content-between">
+                        <div>
+                            <!-- Header de la tarjeta de archivo -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="rounded p-2 text-white d-flex align-items-center justify-content-center shadow-sm"
+                                        [ngClass]="{
+                                            'bg-danger': doc.tipo === 'DWG',
+                                            'bg-success': doc.tipo === 'EXCEL',
+                                            'bg-primary': doc.tipo === 'DOCX'
+                                        }" style="width: 48px; height: 48px;">
+                                        @if (doc.tipo === 'DWG') { <i class="bi bi-layers fs-3"></i> }
+                                        @if (doc.tipo === 'EXCEL') { <i class="bi bi-file-earmark-excel fs-3"></i> }
+                                        @if (doc.tipo === 'DOCX') { <i class="bi bi-file-earmark-word fs-3"></i> }
+                                    </div>
+                                    <div class="overflow-hidden">
+                                        <span class="badge text-bg-light border mb-1">{{ doc.categoria }}</span>
+                                        <h3 class="h6 mb-0 text-truncate font-monospace text-body" [title]="doc.nombre">{{ doc.nombre }}</h3>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Chips de proveedor y versión -->
+                            <div class="d-flex align-items-center gap-2 mb-3">
+                                <span class="badge rounded-pill d-flex align-items-center gap-1"
+                                    [ngClass]="doc.proveedor === 'GOOGLE_DRIVE' ? 'text-bg-primary bg-opacity-10 text-primary border border-primary border-opacity-25' : 'text-bg-warning bg-opacity-10 text-warning border border-warning border-opacity-25'">
+                                    <i class="bi" [ngClass]="doc.proveedor === 'GOOGLE_DRIVE' ? 'bi-google' : 'bi-cloud-fill'"></i>
+                                    {{ doc.proveedor === 'GOOGLE_DRIVE' ? 'Google Drive' : 'TeraBox' }}
+                                </span>
+                                <span class="badge text-bg-secondary bg-opacity-10 text-secondary">{{ doc.version }}</span>
+                                <span class="badge bg-success bg-opacity-10 text-success ms-auto">
+                                    <i class="bi bi-check-circle me-1"></i> {{ doc.estadoSincronizacion }}
+                                </span>
+                            </div>
+
+                            <!-- Meta info del archivo -->
+                            <div class="small text-secondary mb-3 d-flex flex-column gap-1 border-top pt-2">
+                                <div class="d-flex justify-content-between">
+                                    <span>Tamaño:</span>
+                                    <span class="text-body fw-medium">{{ doc.tamano }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <span>Última modif.:</span>
+                                    <span class="text-body">{{ doc.ultimaModificacion }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Acciones -->
+                        <div class="pt-2 border-top d-flex gap-2">
+                            <button class="pd-btn pd-btn--primary btn-sm flex-fill" (click)="abrirVisorDocumento(doc)">
+                                <i class="bi bi-eye me-1"></i> Previsualizar
+                            </button>
+                            <a [href]="doc.urlAcceso" target="_blank" rel="noopener" class="pd-btn pd-btn--outline btn-sm text-decoration-none" [title]="'Abrir en ' + (doc.proveedor === 'GOOGLE_DRIVE' ? 'Google Drive' : 'TeraBox')">
+                                <i class="bi" [ngClass]="doc.proveedor === 'GOOGLE_DRIVE' ? 'bi-google' : 'bi-cloud-fill'"></i>
+                            </a>
+                            <button class="pd-btn pd-btn--outline btn-sm text-secondary" (click)="showUploadModal.set(true)" title="Subir nueva versión">
+                                <i class="bi bi-arrow-repeat"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                } @empty {
+                <div class="col-12">
+                    <div class="text-center py-5 text-secondary border rounded bg-body-tertiary">
+                        <i class="bi bi-folder-x fs-1 d-block mb-2 text-secondary"></i>
+                        <h3 class="h6 fw-bold text-body mb-1">Sin archivos o planos subidos aún</h3>
+                        <p class="small text-secondary mb-3">Esta obra no posee planos DWG, metrados Excel ni expedientes Word registrados.</p>
+                        <button class="pd-btn pd-btn--primary btn-sm" (click)="showUploadModal.set(true)">
+                            <i class="bi bi-cloud-plus me-1"></i> Subir el Primer Archivo
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+        </div>
     </div>
+
+    <!-- Modal Visor Integrado de Planos y Archivos (iFrame de Nube) -->
+    @if (selectedDocPreview()) {
+    <div class="lightbox-overlay d-flex align-items-center justify-content-center position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75"
+        style="z-index: 1060;" (click)="cerrarVisor()">
+        <div class="pd-card p-0 bg-body rounded shadow-lg overflow-hidden d-flex flex-column" style="width: 92vw; height: 90vh;" (click)="$event.stopPropagation()">
+            <!-- Visor Header -->
+            <div class="p-3 bg-body-tertiary border-bottom d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded p-2 text-white d-flex align-items-center justify-content-center"
+                        [ngClass]="{
+                            'bg-danger': selectedDocPreview()?.tipo === 'DWG',
+                            'bg-success': selectedDocPreview()?.tipo === 'EXCEL',
+                            'bg-primary': selectedDocPreview()?.tipo === 'DOCX'
+                        }" style="width: 38px; height: 38px;">
+                        <i class="bi" [ngClass]="{
+                            'bi-layers': selectedDocPreview()?.tipo === 'DWG',
+                            'bi-file-earmark-excel': selectedDocPreview()?.tipo === 'EXCEL',
+                            'bi-file-earmark-word': selectedDocPreview()?.tipo === 'DOCX'
+                        }"></i>
+                    </div>
+                    <div>
+                        <h3 class="h6 mb-0 fw-bold text-body font-monospace">{{ selectedDocPreview()?.nombre }}</h3>
+                        <span class="small text-secondary">
+                            Visor Cloud • {{ selectedDocPreview()?.proveedor === 'GOOGLE_DRIVE' ? 'Google Drive' : 'TeraBox' }}
+                        </span>
+                    </div>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a [href]="selectedDocPreview()?.urlAcceso" target="_blank" class="pd-btn pd-btn--outline btn-sm text-decoration-none">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Abrir en pestana externa
+                    </a>
+                    <button type="button" class="pd-btn pd-btn--outline btn-sm text-body border-0 fs-5" (click)="cerrarVisor()">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Visor Body (Frame) -->
+            <div class="flex-fill bg-dark position-relative">
+                @if (previewSafeUrl()) {
+                <iframe [src]="previewSafeUrl()" class="w-100 h-100 border-0" allow="autoplay"></iframe>
+                } @else {
+                <div class="d-flex align-items-center justify-content-center h-100 text-white">
+                    <i class="bi bi-arrow-repeat spin-anim me-2 fs-4"></i> Cargando documento...
+                </div>
+                }
+            </div>
+        </div>
+    </div>
+    }
+
+    <!-- Modal para Subir / Vincular Archivos de Obra -->
+    @if (showUploadModal()) {
+    <div class="lightbox-overlay d-flex align-items-center justify-content-center position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-50"
+        style="z-index: 1050;" (click)="showUploadModal.set(false)">
+        <div class="pd-card p-4 bg-body rounded shadow-lg" style="width: 100%; max-width: 520px;" (click)="$event.stopPropagation()">
+            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-3">
+                <h3 class="h5 mb-0 fw-bold text-body"><i class="bi bi-cloud-arrow-up me-2 text-primary"></i>Subir / Vincular Archivo</h3>
+                <button type="button" class="btn-close" (click)="showUploadModal.set(false)"></button>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Tipo de Archivo</label>
+                <select class="form-select" [value]="uploadTipo()" (change)="uploadTipo.set($any($event.target).value)">
+                    <option value="DWG">Plano de Arquitectura / Estructuras (.dwg)</option>
+                    <option value="EXCEL">Presupuesto y Metrados (.xlsx)</option>
+                    <option value="DOCX">Expediente Técnico / Memoria (.docx)</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Servicio de Almacenamiento Cloud</label>
+                <div class="d-flex gap-3">
+                    <div class="form-check flex-fill p-3 border rounded cursor-pointer" (click)="uploadProveedor.set('GOOGLE_DRIVE')">
+                        <input class="form-check-input" type="radio" name="cloudProvider" id="driveRadio" [checked]="uploadProveedor() === 'GOOGLE_DRIVE'">
+                        <label class="form-check-label fw-bold d-block cursor-pointer" for="driveRadio">
+                            <i class="bi bi-google text-primary me-1"></i> Google Drive
+                        </label>
+                    </div>
+                    <div class="form-check flex-fill p-3 border rounded cursor-pointer" (click)="uploadProveedor.set('TERABOX')">
+                        <input class="form-check-input" type="radio" name="cloudProvider" id="teraboxRadio" [checked]="uploadProveedor() === 'TERABOX'">
+                        <label class="form-check-label fw-bold d-block cursor-pointer" for="teraboxRadio">
+                            <i class="bi bi-cloud-fill text-warning me-1"></i> TeraBox
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            @if (uploadProveedor() === 'TERABOX') {
+            <div class="mb-3">
+                <label class="form-label small fw-bold">Enlace Público de TeraBox</label>
+                <input type="text" class="form-control" placeholder="https://terabox.com/s/1a2b3c4d..." [value]="uploadLinkTerabox()" (input)="uploadLinkTerabox.set($any($event.target).value)">
+                <span class="small text-secondary mt-1 d-block">Pega el enlace de compartir generado en TeraBox.</span>
+            </div>
+            }
+
+            <div class="mb-4">
+                <label class="form-label small fw-bold">Seleccionar o Arrastrar Archivo Local</label>
+                <div class="border border-2 border-dashed rounded p-4 text-center bg-body-tertiary">
+                    <i class="bi bi-file-earmark-arrow-up fs-1 text-secondary mb-2 d-block"></i>
+                    @if (selectedFileToUpload()) {
+                        <span class="badge text-bg-primary fs-6 mb-1">{{ selectedFileToUpload()?.name }}</span>
+                        <span class="small text-secondary d-block">{{ (selectedFileToUpload()!.size / (1024 * 1024)).toFixed(2) }} MB</span>
+                    } @else {
+                        <span class="small text-secondary d-block mb-2">Arrastra tu archivo aquí o haz clic para examinar</span>
+                        <input type="file" class="form-control form-control-sm" accept=".dwg,.xlsx,.xls,.docx,.doc" (change)="onFileSelected($event)">
+                    }
+                </div>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+                <button class="pd-btn pd-btn--outline" (click)="showUploadModal.set(false)">Cancelar</button>
+                <button class="pd-btn pd-btn--primary" (click)="guardarYVincularArchivo()" [disabled]="isUploading()">
+                    <i class="bi" [ngClass]="isUploading() ? 'bi-arrow-repeat spin-anim' : 'bi-cloud-upload'"></i>
+                    {{ isUploading() ? 'Guardando...' : 'Sincronizar y Guardar' }}
+                </button>
+            </div>
+        </div>
+    </div>
+    }
 
     <!-- Sección de Historial de Partes -->
     <div class="mb-5">

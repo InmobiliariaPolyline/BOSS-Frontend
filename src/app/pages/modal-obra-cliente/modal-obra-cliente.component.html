@@ -12,6 +12,14 @@
         <p class="text-muted small mb-4">Registra los datos generales de la obra y del cliente. El código se genera
             automáticamente.</p>
 
+        @if (errorMessage()) {
+            <div class="alert alert-danger d-flex align-items-center gap-2 mb-3 py-2 px-3 rounded-3 shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0"></i>
+                <div class="small fw-medium flex-grow-1">{{ errorMessage() }}</div>
+                <button type="button" class="btn-close ms-auto small" (click)="errorMessage.set('')" aria-label="Cerrar"></button>
+            </div>
+        }
+
         <!-- SECCIÓN: DATOS DE LA OBRA -->
         <form [formGroup]="$form()">
             <section class="mb-4">
@@ -193,10 +201,20 @@
     </div>
 
     <!-- BOTONERA DE ACCIÓN -->
-    <div class="modal-footer border-top-0 pt-0 pb-4 px-4 d-flex justify-content-end gap-2">
-        <button type="button" class="btn btn-light border fw-semibold px-4 py-2" (click)="cerrar()">Cancelar</button>
-        <button type="button" class="btn btn-primary fw-semibold px-4 py-2"
-            [disabled]="mostrarCrearCliente() ? ($form().invalid || $form2().invalid) : ($form().invalid || !selectedCliente())"
-            (click)="registrar()">Crear obra</button>
+    <div class="modal-footer border-top-0 pt-0 pb-4 px-4 d-flex justify-content-between align-items-center flex-nowrap">
+        @if (mostrarCrearCliente() ? ($form().invalid || $form2().invalid) : ($form().invalid || !selectedCliente())) {
+            <span class="text-muted small me-2 flex-shrink-1 text-truncate" title="Completa todos los campos obligatorios (*)">
+                <i class="bi bi-info-circle text-warning me-1 fs-6"></i>Completa los campos obligatorios (*)
+            </span>
+        } @else {
+            <div></div>
+        }
+        <div class="d-flex gap-2 flex-shrink-0 ms-auto">
+            <button type="button" class="btn btn-light border fw-semibold px-4 py-2" (click)="cerrar()">Cancelar</button>
+            <button type="button" class="btn btn-primary fw-semibold px-4 py-2"
+                [disabled]="mostrarCrearCliente() ? ($form().invalid || $form2().invalid) : ($form().invalid || !selectedCliente())"
+                [title]="(mostrarCrearCliente() ? ($form().invalid || $form2().invalid) : ($form().invalid || !selectedCliente())) ? 'Completa todos los campos obligatorios (*)' : ''"
+                (click)="registrar()">Crear obra</button>
+        </div>
     </div>
 </div>

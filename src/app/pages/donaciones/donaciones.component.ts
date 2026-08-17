@@ -8,7 +8,6 @@ import { MaterialService } from '../../services/material.service';
 import { Material } from '../../model/material';
 import { FiltroTextoDirective } from '../../shared/directives/filtro-texto.directive';
 import { FiltroNumerosDirective } from '../../shared/directives/filtro-numeros.directive';
-import { FiltroFechasDirective } from '../../shared/directives/filtro-fechas.directive';
 import { firstValueFrom } from 'rxjs';
 
 @Component({
@@ -19,7 +18,6 @@ import { firstValueFrom } from 'rxjs';
     ReactiveFormsModule,
     FiltroTextoDirective,
     FiltroNumerosDirective,
-    FiltroFechasDirective,
   ],
   templateUrl: './donaciones.component.html',
   styleUrl: './donaciones.component.css'

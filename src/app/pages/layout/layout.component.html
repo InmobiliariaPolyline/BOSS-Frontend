@@ -1,11 +1,6 @@
 <div class="layout-shell" [class.layout-shell--sidebar-open]="sidebarOpen()">
     @if (sidebarOpen()) {
-        <button
-            type="button"
-            class="layout-backdrop"
-            aria-label="Cerrar navegación"
-            (click)="closeSidebar()"
-        ></button>
+    <button type="button" class="layout-backdrop" aria-label="Cerrar navegación" (click)="closeSidebar()"></button>
     }
 
     <aside class="layout-sidebar" aria-label="Navegación principal">
@@ -22,87 +17,98 @@
 
         <div class="sidebar-section">
             @if (hasObras()) {
-                @if (selectedObra(); as obraActiva) {
-                    <button type="button" class="obra-selector" (click)="toggleObraPanel()" aria-label="Seleccionar obra activa">
-                        <span class="obra-selector-icon">
+            @if (selectedObra(); as obraActiva) {
+            <button type="button" class="obra-selector" (click)="toggleObraPanel()"
+                aria-label="Seleccionar obra activa">
+                <span class="obra-selector-icon">
+                    <i class="bi bi-building"></i>
+                </span>
+                <span class="obra-selector-copy">
+                    <span class="obra-selector-label">OBRA ACTIVA</span>
+                    <span class="obra-selector-value">{{ obraActiva.nombreObra }}</span>
+                </span>
+                <i class="bi bi-chevron-expand chevron-icon"></i>
+            </button>
+
+            @if (obraPanelOpen()) {
+            <div class="obra-panel" role="dialog" aria-label="Selector de obras">
+                <!-- Buscador de Obras -->
+                <div class="obra-search-container">
+                    <i class="bi bi-search obra-search-icon"></i>
+                    <input type="text" class="obra-search-input" placeholder="Buscar obra por nombre o código..."
+                        [ngModel]="searchObra()" (ngModelChange)="searchObra.set($event)"
+                        (click)="$event.stopPropagation()" />
+                    @if (searchObra()) {
+                    <button type="button" class="obra-search-clear" (click)="searchObra.set('')"
+                        aria-label="Limpiar búsqueda">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                    }
+                </div>
+
+                <div class="obra-results">
+                    @for (obra of filteredObras(); track trackByObraId($index, obra)) {
+                    <button type="button" class="obra-result"
+                        [class.obra-result--selected]="obraActiva.idObra === obra.idObra" (click)="selectObra(obra)">
+                        <span class="obra-result-icon">
                             <i class="bi bi-building"></i>
                         </span>
-                        <span class="obra-selector-copy">
-                            <span class="obra-selector-label">OBRA ACTIVA</span>
-                            <span class="obra-selector-value">{{ obraActiva.nombreObra }}</span>
-                        </span>
-                        <i class="bi bi-chevron-expand chevron-icon"></i>
-                    </button>
-
-                    @if (obraPanelOpen()) {
-                        <div class="obra-panel" role="dialog" aria-label="Selector de obras">
-                            <div class="obra-results">
-                                @for (obra of obras(); track trackByObraId($index, obra)) {
-                                    <button
-                                        type="button"
-                                        class="obra-result"
-                                        [class.obra-result--selected]="obraActiva.idObra === obra.idObra"
-                                        (click)="selectObra(obra)"
-                                    >
-                                        <span class="obra-result-icon">
-                                            <i class="bi bi-building"></i>
-                                        </span>
-                                        <span class="obra-result-copy">
-                                            <span class="obra-result-title-row">
-                                                <strong>{{ obra.nombreObra }}</strong>
-                                                @if (obraActiva.idObra === obra.idObra) {
-                                                    <i class="bi bi-check-lg obra-selected-check"></i>
-                                                }
-                                            </span>
-                                            <span class="obra-result-code">OBR-{{ obra.idObra }}</span>
-                                            <span class="obra-result-location">
-                                                <i class="bi bi-geo-alt"></i>
-                                                <small>{{ obra.ubicacion }}</small>
-                                            </span>
-                                        </span>
-                                        <span class="obra-status">Activa</span>
-                                    </button>
+                        <span class="obra-result-copy">
+                            <span class="obra-result-title-row">
+                                <strong>{{ obra.nombreObra }}</strong>
+                                @if (obraActiva.idObra === obra.idObra) {
+                                <i class="bi bi-check-lg obra-selected-check"></i>
                                 }
-                            </div>
-                            @if (isJefe || isDeveloper) {
-                            <button type="button" class="btn btn-outline-primary btn-sm w-100 create-obra-action mt-2 d-flex align-items-center justify-content-center gap-1" (click)="openCreateObraDialog()">
-                                <i class="bi bi-plus-lg"></i>
-                                Crear nueva obra
-                            </button>
-                            }
-                        </div>
+                            </span>
+                            <span class="obra-result-code">OBR-{{ obra.idObra }}</span>
+                            <span class="obra-result-location">
+                                <i class="bi bi-geo-alt"></i>
+                                <small>{{ obra.ubicacion }}</small>
+                            </span>
+                        </span>
+                        <span class="obra-status">Activa</span>
+                    </button>
                     }
-                }
-            } @else if(isJefe || isDeveloper) {
-                <button type="button" class="empty-obra-card" (click)="openCreateObraDialog()">
-                    <span class="empty-obra-card__eyebrow">OBRA ACTIVA</span>
-                    <strong>Crear nueva obra</strong>
-                    <span>Necesitas registrar al menos una obra para comenzar.</span>
+                    @if (filteredObras().length === 0) {
+                    <div class="text-center text-muted small py-3">
+                        No se encontraron obras coincidentes.
+                    </div>
+                    }
+                </div>
+                @if (isJefe || isDeveloper) {
+                <button type="button"
+                    class="btn btn-outline-primary btn-sm w-100 create-obra-action mt-2 d-flex align-items-center justify-content-center gap-1"
+                    (click)="openCreateObraDialog()">
+                    <i class="bi bi-plus-lg"></i>
+                    Crear nueva obra
                 </button>
+                }
+            </div>
+            }
+            }
+            } @else if(isJefe || isDeveloper) {
+            <button type="button" class="empty-obra-card" (click)="openCreateObraDialog()">
+                <span class="empty-obra-card__eyebrow">OBRA ACTIVA</span>
+                <strong>Crear nueva obra</strong>
+                <span>Necesitas registrar al menos una obra para comenzar.</span>
+            </button>
             }
         </div>
 
         <nav class="sidebar-nav" aria-label="Secciones del sistema">
             @for (item of navigationItems; track item.label) {
-                <button
-                    class="nav-item d-flex align-items-center gap-2"
-                    [routerLink]="item.route"
-                    routerLinkActive="nav-item--active"
-                    [disabled]="!selectedObra() && !item.exempt"
-                    [style.opacity]="!selectedObra() && !item.exempt ? '0.5' : '1'"
-                    [style.cursor]="!selectedObra() && !item.exempt ? 'not-allowed' : 'pointer'"
-                >
-                    <i class="bi bi-{{ item.icon }} fs-5"></i>
-                    <span>{{ item.label }}</span>
-                </button>
+            <button class="nav-item d-flex align-items-center gap-2" [routerLink]="item.route"
+                routerLinkActive="nav-item--active" [disabled]="!selectedObra() && !item.exempt"
+                [style.opacity]="!selectedObra() && !item.exempt ? '0.5' : '1'"
+                [style.cursor]="!selectedObra() && !item.exempt ? 'not-allowed' : 'pointer'">
+                <i class="bi bi-{{ item.icon }} fs-5"></i>
+                <span>{{ item.label }}</span>
+            </button>
             }
 
-            <button
-                type="button"
+            <button type="button"
                 class="nav-item d-flex align-items-center gap-2 text-danger mt-3 border-0 bg-transparent"
-                (click)="logout()"
-                style="width: 100%; text-align: left;"
-            >
+                (click)="logout()" style="width: 100%; text-align: left;">
                 <i class="bi bi-box-arrow-right fs-5 text-danger"></i>
                 <span class="text-danger fw-semibold">Cerrar Sesión</span>
             </button>
@@ -114,33 +120,44 @@
     </aside>
 
     <main class="layout-main">
-        <header class="layout-topbar">
-            <button type="button" class="btn btn-link text-decoration-none border-0 sidebar-toggle text-body" aria-label="Abrir navegación" (click)="toggleSidebar()">
+        <header class="layout-topbar position-relative">
+            <button type="button" class="btn btn-link text-decoration-none border-0 sidebar-toggle text-body"
+                aria-label="Abrir navegación" (click)="toggleSidebar()">
                 <i class="bi bi-list fs-4"></i>
             </button>
+            @if (selectedObra(); as obraActiva) {
+            <div class="topbar-obra-badge">
+                <span class="fw-bold text-main text-truncate" style="font-size: 30px; max-width: 550px;">{{
+                    obraActiva.nombreObra }}</span>
+            </div>
+            }
             <div style="flex: 1 1 auto;"></div>
-            <button type="button" class="btn btn-link text-decoration-none border-0 text-body" (click)="toggleTheme()" aria-label="Cambiar tema">
+            <button type="button" class="btn btn-link text-decoration-none border-0 text-body ms-auto"
+                (click)="toggleTheme()" aria-label="Cambiar tema">
                 <i class="bi" [ngClass]="isDarkMode() ? 'bi-sun' : 'bi-moon'"></i>
             </button>
         </header>
 
         <section class="layout-content">
             @if (selectedObra() || currentUrl().includes('/pages/usuarios')) {
-                <router-outlet></router-outlet>
+            <router-outlet></router-outlet>
             } @else {
-                <div class="h-100 d-flex flex-column align-items-center justify-content-center text-secondary text-center p-4">
-                    <i class="bi bi-building-exclamation display-1 mb-4" style="color: var(--color-border); font-size: 6rem;"></i>
-                    <h2 class="h3 fw-bold mb-3" style="color: var(--color-primary);">Sin Obra Seleccionada</h2>
-                    <p class="text-muted fs-5 mb-4" style="max-width: 500px;">
-                        Para visualizar el contenido y comenzar a trabajar, seleccione una obra existente en el panel izquierdo o cree una nueva.
-                    </p>
-                    @if (isJefe || isDeveloper) {
-                        <button class="pd-btn pd-btn--primary px-4 py-2 fs-6 rounded-pill" (click)="openCreateObraDialog()">
-                            <i class="bi bi-plus-lg me-2"></i>
-                            Crear Obra
-                        </button>
-                    }
-                </div>
+            <div
+                class="h-100 d-flex flex-column align-items-center justify-content-center text-secondary text-center p-4">
+                <i class="bi bi-building-exclamation display-1 mb-4"
+                    style="color: var(--color-border); font-size: 6rem;"></i>
+                <h2 class="h3 fw-bold mb-3" style="color: var(--color-primary);">Sin Obra Seleccionada</h2>
+                <p class="text-muted fs-5 mb-4" style="max-width: 500px;">
+                    Para visualizar el contenido y comenzar a trabajar, seleccione una obra existente en el panel
+                    izquierdo o cree una nueva.
+                </p>
+                @if (isJefe || isDeveloper) {
+                <button class="pd-btn pd-btn--primary px-4 py-2 fs-6 rounded-pill" (click)="openCreateObraDialog()">
+                    <i class="bi bi-plus-lg me-2"></i>
+                    Crear Obra
+                </button>
+                }
+            </div>
             }
         </section>
     </main>
