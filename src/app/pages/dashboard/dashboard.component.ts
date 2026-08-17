@@ -71,8 +71,6 @@ export class DashboardComponent {
   // Formulario de Subida
   readonly selectedFileToUpload = signal<File | null>(null);
   readonly uploadTipo = signal<'DWG' | 'EXCEL' | 'DOCX'>('DWG');
-  readonly uploadProveedor = signal<'GOOGLE_DRIVE' | 'TERABOX'>('GOOGLE_DRIVE');
-  readonly uploadLinkTerabox = signal<string>('');
   readonly isUploading = signal(false);
 
   // Documentos de Obra (Sincronizados con backend Spring Boot + Drive / TeraBox)
@@ -203,9 +201,7 @@ export class DashboardComponent {
 
   abrirModalSubida(): void {
     this.selectedFileToUpload.set(null);
-    this.uploadLinkTerabox.set('');
     this.uploadTipo.set('DWG');
-    this.uploadProveedor.set('GOOGLE_DRIVE');
     this.showUploadModal.set(true);
   }
 
@@ -231,9 +227,7 @@ export class DashboardComponent {
     }
 
     const file = this.selectedFileToUpload();
-    const proveedor = this.uploadProveedor();
     const tipo = this.uploadTipo();
-    const url = proveedor === 'TERABOX' ? (this.uploadLinkTerabox() || 'https://www.terabox.com') : 'https://drive.google.com';
 
     this.isUploading.set(true);
 
@@ -243,9 +237,11 @@ export class DashboardComponent {
         formData.append('file', file);
         formData.append('idObra', obra.idObra.toString());
         formData.append('tipoArchivo', tipo);
-        formData.append('proveedorNube', proveedor);
-        formData.append('categoria', tipo === 'DWG' ? 'Plano de Obra' : (tipo === 'EXCEL' ? 'Presupuesto y Metrados' : 'Expediente Técnico'));
-        formData.append('urlAcceso', url);
+        formData.append('proveedorNube', 'GOOGLE_DRIVE');
+
+        const categoria = tipo === 'DWG' ? 'Plano de Obra' : (tipo === 'EXCEL' ? 'Presupuesto y Metrados' : 'Expediente Técnico');
+        formData.append('categoria', categoria);
+        formData.append('urlAcceso', 'https://drive.google.com');
 
         await firstValueFrom(this.obraArchivoService.uploadFile(formData));
       } else {
@@ -255,8 +251,8 @@ export class DashboardComponent {
           nombreArchivo: nombre,
           tipoArchivo: tipo,
           fileIdNube: 'cloud-' + Date.now(),
-          proveedorNube: proveedor,
-          urlAcceso: url,
+          proveedorNube: 'GOOGLE_DRIVE',
+          urlAcceso: 'https://drive.google.com',
           categoria: tipo === 'DWG' ? 'Plano de Obra' : (tipo === 'EXCEL' ? 'Presupuesto y Metrados' : 'Expediente Técnico'),
           tamano: '2.5 MB',
           version: 'v1.0',
@@ -269,7 +265,6 @@ export class DashboardComponent {
       await this.cargarArchivosObra();
       this.showUploadModal.set(false);
       this.selectedFileToUpload.set(null);
-      this.uploadLinkTerabox.set('');
     } catch (err: any) {
       console.error('Error guardando archivo en backend:', err);
       alert(err?.error?.message || 'Error en el servidor al procesar el archivo. Revisa los logs de Render o las credenciales de Google Drive.');
